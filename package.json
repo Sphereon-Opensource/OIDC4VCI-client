@@ -23,7 +23,8 @@
     "node": ">=18"
   },
   "resolutions": {
-    "@sphereon/ssi-types": "0.30.2-feature.mdoc.funke2.367",
+    "@sphereon/ssi-types": "0.32.1-feature.VDX.341.53",
+    "dcql": "0.2.19",
     "node-fetch": "2.6.12"
   },
   "prettier": {
@@ -66,4 +67,3 @@
     "OID4VP"
   ]
 }
-

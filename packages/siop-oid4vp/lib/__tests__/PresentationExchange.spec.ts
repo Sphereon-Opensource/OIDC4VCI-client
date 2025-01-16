@@ -337,9 +337,7 @@ describe('presentation exchange manager tests', () => {
     const payload = await getPayloadVID1Val()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ;(payload.claims?.vp_token as any).presentation_definition_uri = EXAMPLE_PD_URL
-    await expect(PresentationExchange.findValidPresentationDefinitions(payload)).rejects.toThrow(
-      SIOPErrors.REQUEST_CLAIMS_PRESENTATION_DEFINITION_BY_REF_AND_VALUE_NON_EXCLUSIVE,
-    )
+    await expect(PresentationExchange.findValidPresentationDefinitions(payload)).rejects.toThrow(SIOPErrors.REQUEST_CLAIMS_PRESENTATION_NON_EXCLUSIVE)
   })
 
   it('validatePresentationAgainstDefinition: should pass if provided VP match the PD', async function () {

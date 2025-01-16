@@ -1,16 +1,19 @@
-import { CredentialMapper, Hasher } from '@sphereon/ssi-types'
+import { CredentialMapper, Hasher, WrappedVerifiablePresentation } from '@sphereon/ssi-types'
+import { DcqlPresentation } from 'dcql'
 
 import { AuthorizationRequest, VerifyAuthorizationRequestOpts } from '../authorization-request'
 import { assertValidVerifyAuthorizationRequestOpts } from '../authorization-request/Opts'
 import { IDToken } from '../id-token'
 import { AuthorizationResponsePayload, ResponseType, SIOPErrors, VerifiedAuthorizationRequest, VerifiedAuthorizationResponse } from '../types'
 
+import { Dcql } from './Dcql'
 import {
   assertValidVerifiablePresentations,
   extractNonceFromWrappedVerifiablePresentation,
   extractPresentationsFromVpToken,
   verifyPresentations,
 } from './OpenID4VP'
+import { extractPresentationsFromDcqlVpToken } from './OpenID4VP'
 import { assertValidResponseOpts } from './Opts'
 import { createResponsePayload } from './Payload'
 import { AuthorizationResponseOpts, PresentationDefinitionWithLocation, VerifyAuthorizationResponseOpts } from './types'
@@ -123,9 +126,11 @@ export class AuthorizationResponse {
       authorizationRequest,
     })
 
-    if (hasVpToken) {
+    if (!hasVpToken) return response
+
+    if (responseOpts.presentationExchange) {
       const wrappedPresentations = response.payload.vp_token
-        ? await extractPresentationsFromVpToken(response.payload.vp_token, {
+        ? extractPresentationsFromVpToken(response.payload.vp_token, {
             hasher: verifyOpts.hasher,
           })
         : []
@@ -139,6 +144,12 @@ export class AuthorizationResponse {
           hasher: verifyOpts.hasher,
         },
       })
+    } else if (verifiedAuthorizationRequest.dcqlQuery) {
+      await Dcql.assertValidDcqlPresentationResult(responseOpts.dcqlQuery.dcqlPresentation as DcqlPresentation, verifiedAuthorizationRequest.dcqlQuery, {
+        hasher: verifyOpts.hasher,
+      })
+    } else {
+      throw new Error('vp_token is present, but no presentation definitions or dcql query provided')
     }
 
     return response
@@ -155,11 +166,20 @@ export class AuthorizationResponse {
     }
 
     const verifiedIdToken = await this.idToken?.verify(verifyOpts)
-    const oid4vp = await verifyPresentations(this, verifyOpts)
+    if (this.payload.vp_token && !verifyOpts.presentationDefinitions && !verifyOpts.dcqlQuery) {
+      throw new Error('vp_token is present, but no presentation definitions or dcql query provided')
+    }
+
+    const emptyPresentationDefinitions = Array.isArray(verifyOpts.presentationDefinitions) && verifyOpts.presentationDefinitions.length === 0
+    if (!this.payload.vp_token && ((verifyOpts.presentationDefinitions && !emptyPresentationDefinitions) || verifyOpts.dcqlQuery)) {
+      throw new Error('Presentation definitions or dcql query provided, but no vp_token present')
+    }
+
+    const oid4vp = this.payload.vp_token ? await verifyPresentations(this, verifyOpts) : undefined
 
     // Gather all nonces
     const allNonces = new Set<string>()
-    if (oid4vp && oid4vp.nonce) allNonces.add(oid4vp.nonce)
+    if (oid4vp && (oid4vp.dcql?.nonce || oid4vp.presentationExchange?.nonce)) allNonces.add(oid4vp.dcql?.nonce ?? oid4vp.presentationExchange?.nonce)
     if (verifiedIdToken) allNonces.add(verifiedIdToken.payload.nonce)
     if (merged.nonce) allNonces.add(merged.nonce)
 
@@ -185,7 +205,8 @@ export class AuthorizationResponse {
       state,
       correlationId: verifyOpts.correlationId,
       ...(this.idToken && { idToken: verifiedIdToken }),
-      ...(oid4vp && { oid4vpSubmission: oid4vp }),
+      ...(oid4vp?.presentationExchange && { oid4vpSubmission: oid4vp.presentationExchange }),
+      ...(oid4vp?.dcql && { oid4vpSubmissionDcql: oid4vp.dcql }),
     }
   }
 
@@ -206,14 +227,21 @@ export class AuthorizationResponse {
   }
 
   public async getMergedProperty<T>(key: string, opts?: { consistencyCheck?: boolean; hasher?: Hasher }): Promise<T | undefined> {
-    const merged = await this.mergedPayloads(opts)
+    const merged = await this.mergedPayloads(opts) // FIXME this is really bad, expensive...
     return merged[key] as T
   }
 
   public async mergedPayloads(opts?: { consistencyCheck?: boolean; hasher?: Hasher }): Promise<AuthorizationResponsePayload> {
     let nonce: string | undefined = this._payload.nonce
     if (this._payload?.vp_token) {
-      const presentations = this.payload.vp_token ? await extractPresentationsFromVpToken(this.payload.vp_token, opts) : []
+      let presentations: WrappedVerifiablePresentation | WrappedVerifiablePresentation[]
+
+      try {
+        presentations = extractPresentationsFromDcqlVpToken(this._payload.vp_token as string, opts)
+      } catch (e) {
+        presentations = extractPresentationsFromVpToken(this._payload.vp_token, opts)
+      }
+
       if (!presentations || (Array.isArray(presentations) && presentations.length === 0)) {
         return Promise.reject(Error('missing presentation(s)'))
       }

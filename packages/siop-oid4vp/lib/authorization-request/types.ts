@@ -1,7 +1,7 @@
 import { SigningAlgo } from '@sphereon/oid4vc-common'
 import { Hasher } from '@sphereon/ssi-types'
 
-import { PresentationDefinitionPayloadOpts } from '../authorization-response'
+import { DcqlQueryPayloadOpts, PresentationDefinitionPayloadOpts } from '../authorization-response'
 import { RequestObjectOpts } from '../request-object'
 import {
   ClientIdScheme,
@@ -19,7 +19,7 @@ import { VerifyJwtCallback } from '../types/VpJwtVerifier'
 
 export interface ClaimPayloadOptsVID1 extends ClaimPayloadCommonOpts {
   id_token?: IdTokenClaimPayload
-  vp_token?: PresentationDefinitionPayloadOpts
+  vp_token?: PresentationDefinitionPayloadOpts | DcqlQueryPayloadOpts
 }
 
 export interface ClaimPayloadCommonOpts {

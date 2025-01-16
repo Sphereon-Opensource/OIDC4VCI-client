@@ -29,7 +29,8 @@ function isID1Payload(authorizationRequest: AuthorizationRequestPayload) {
     !authorizationRequest.client_metadata_uri &&
     !authorizationRequest.client_metadata &&
     !authorizationRequest.presentation_definition &&
-    !authorizationRequest.presentation_definition_uri
+    !authorizationRequest.presentation_definition_uri &&
+    !authorizationRequest.dcql_query
   )
 }
 

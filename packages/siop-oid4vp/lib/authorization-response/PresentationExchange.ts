@@ -196,7 +196,7 @@ export class PresentationExchange {
       ).map((d) => d.value)
       const vpTokenRefs = extractDataFromPath(authorizationRequestPayload, '$..vp_token.presentation_definition_uri')
       if (vpTokens && vpTokens.length && vpTokenRefs && vpTokenRefs.length) {
-        throw new Error(SIOPErrors.REQUEST_CLAIMS_PRESENTATION_DEFINITION_BY_REF_AND_VALUE_NON_EXCLUSIVE)
+        throw new Error(SIOPErrors.REQUEST_CLAIMS_PRESENTATION_NON_EXCLUSIVE)
       }
       if (vpTokens && vpTokens.length) {
         vpTokens.forEach((vpToken: PresentationDefinitionV1 | PresentationDefinitionV2) => {
@@ -253,7 +253,7 @@ export class PresentationExchange {
       const hasPD = (definitions && definitions.length > 0) || (definitionsFromList && definitionsFromList.length > 0)
       const hasPdRef = (definitionRefs && definitionRefs.length > 0) || (definitionRefsFromList && definitionRefsFromList.length > 0)
       if (hasPD && hasPdRef) {
-        throw new Error(SIOPErrors.REQUEST_CLAIMS_PRESENTATION_DEFINITION_BY_REF_AND_VALUE_NON_EXCLUSIVE)
+        throw new Error(SIOPErrors.REQUEST_CLAIMS_PRESENTATION_NON_EXCLUSIVE)
       }
       if (definitions && definitions.length > 0) {
         definitions.forEach((definition) => {

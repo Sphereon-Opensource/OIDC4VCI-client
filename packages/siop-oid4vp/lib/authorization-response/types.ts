@@ -9,6 +9,7 @@ import {
   PresentationSubmission,
   W3CVerifiablePresentation,
 } from '@sphereon/ssi-types'
+import { DcqlQuery } from 'dcql'
 
 import {
   ResponseMode,
@@ -41,6 +42,7 @@ export interface AuthorizationResponseOpts {
   tokenType?: string
   refreshToken?: string
   presentationExchange?: PresentationExchangeResponseOpts
+  dcqlQuery?: DcqlQueryResponseOpts
 }
 
 export interface PresentationExchangeResponseOpts {
@@ -59,13 +61,20 @@ export interface PresentationExchangeResponseOpts {
   restrictToDIDMethods?: string[]
 }
 
-export interface PresentationExchangeRequestOpts {
-  presentationVerificationCallback?: PresentationVerificationCallback
+export interface DcqlQueryResponseOpts {
+  dcqlPresentation: Record<string, Record<string, unknown> | string>
 }
 
 export interface PresentationDefinitionPayloadOpts {
   presentation_definition?: IPresentationDefinition
   presentation_definition_uri?: string
+  dcql_query?: never
+}
+
+export interface DcqlQueryPayloadOpts {
+  dcql_query?: string
+  presentation_definition?: never
+  presentation_definition_uri?: never
 }
 
 export interface PresentationDefinitionWithLocation {
@@ -95,7 +104,7 @@ export type PresentationVerificationResult = { verified: boolean; reason?: strin
 
 export type PresentationVerificationCallback = (
   args: W3CVerifiablePresentation | CompactSdJwtVc | MdocOid4vpIssuerSigned,
-  presentationSubmission: PresentationSubmission,
+  presentationSubmission?: PresentationSubmission,
 ) => Promise<PresentationVerificationResult>
 
 export type PresentationSignCallback = (args: PresentationSignCallBackParams) => Promise<W3CVerifiablePresentation | CompactSdJwtVc>
@@ -108,6 +117,7 @@ export interface VerifyAuthorizationResponseOpts {
   nonce?: string // To verify the response against the supplied nonce
   state?: string // To verify the response against the supplied state
   presentationDefinitions?: PresentationDefinitionWithLocation | PresentationDefinitionWithLocation[] // The presentation definitions to match against VPs in the response
+  dcqlQuery?: DcqlQuery
   audience?: string // The audience/redirect_uri
   restrictToFormats?: Format // Further restrict to certain VC formats, not expressed in the presentation definition
   restrictToDIDMethods?: string[]

@@ -26,6 +26,7 @@ import {
   VERIFIERZ_PURPOSE_TO_VERIFY,
   VERIFIERZ_PURPOSE_TO_VERIFY_NL,
 } from './data/mockedData'
+import { DcqlQuery } from 'dcql'
 
 const EXAMPLE_REDIRECT_URL = 'https://acme.com/hello'
 const EXAMPLE_REFERENCE_URL = 'https://rp.acme.com/siop/jwts'
@@ -670,5 +671,86 @@ describe('create Request JWT should', () => {
       },
     }
     await expect(URI.fromOpts(opts)).rejects.toThrow(SIOPErrors.REQUEST_CLAIMS_PRESENTATION_DEFINITION_NOT_VALID)
+  })
+
+  it('should succeed when requesting with a valid dcql query', async () => {
+    const dcqlQuery: DcqlQuery = {
+      credentials: [
+        {
+          id: 'Credentials',
+          format: 'jwt_vc_json',
+          claims: [
+            {
+              id: 'ID Card Credential',
+              path: ['$.issuer.id'],
+              values: ['did:example:issuer'],
+            },
+          ],
+        },
+      ],
+    }
+    const opts: CreateAuthorizationRequestOpts = {
+      version: SupportedVersion.SIOPv2_ID1,
+      payload: {
+        client_id: WELL_KNOWN_OPENID_FEDERATION,
+        scope: 'test',
+        response_type: 'vp_token',
+        request_object_signing_alg_values_supported: [SigningAlgo.ES256, SigningAlgo.EDDSA],
+        redirect_uri: EXAMPLE_REDIRECT_URL,
+      },
+      requestObject: {
+        jwtIssuer: { method: 'did', didUrl: KID, alg: SigningAlgo.ES256K },
+        passBy: PassBy.REFERENCE,
+        reference_uri: EXAMPLE_REFERENCE_URL,
+
+        createJwtCallback: getCreateJwtCallback({
+          hexPrivateKey: HEX_KEY,
+          did: DID,
+          kid: KID,
+          alg: SigningAlgo.ES256K,
+        }),
+        payload: {
+          client_id: WELL_KNOWN_OPENID_FEDERATION,
+          scope: 'test',
+          response_type: 'vp_token',
+          redirect_uri: EXAMPLE_REDIRECT_URL,
+          request_object_signing_alg_values_supported: [SigningAlgo.EDDSA, SigningAlgo.ES256],
+          claims: {
+            vp_token: {
+              dcql_query: JSON.stringify(dcqlQuery)
+            },
+          },
+        },
+      },
+      clientMetadata: {
+        client_id: WELL_KNOWN_OPENID_FEDERATION,
+        idTokenSigningAlgValuesSupported: [SigningAlgo.EDDSA, SigningAlgo.ES256],
+        requestObjectSigningAlgValuesSupported: [SigningAlgo.EDDSA, SigningAlgo.ES256],
+        responseTypesSupported: [ResponseType.ID_TOKEN],
+        scopesSupported: [Scope.OPENID_DIDAUTHN, Scope.OPENID],
+        subject_syntax_types_supported: ['did:ethr:', SubjectIdentifierType.DID],
+        subjectTypesSupported: [SubjectType.PAIRWISE],
+        vpFormatsSupported: {
+          ldp_vc: {
+            proof_type: [IProofType.EcdsaSecp256k1Signature2019, IProofType.EcdsaSecp256k1Signature2019],
+          },
+        },
+
+        passBy: PassBy.VALUE,
+
+        logo_uri: VERIFIER_LOGO_FOR_CLIENT,
+        clientName: VERIFIER_NAME_FOR_CLIENT,
+        'clientName#nl-NL': VERIFIER_NAME_FOR_CLIENT_NL + '2022100305',
+        clientPurpose: VERIFIERZ_PURPOSE_TO_VERIFY,
+        'clientPurpose#nl-NL': VERIFIERZ_PURPOSE_TO_VERIFY_NL,
+      },
+    }
+
+    const uriRequest = await URI.fromOpts(opts)
+
+    const uriDecoded = decodeURIComponent(uriRequest.encodedUri)
+    expect(uriDecoded.startsWith('openid4vp://?')).toBeTruthy()
+    expect(uriDecoded).toContain(`request_uri=https://rp.acme.com/siop/jwts`)
+    expect((await (await uriRequest.toAuthorizationRequest())?.requestObject?.getPayload())?.claims.vp_token).toBeDefined()
   })
 })

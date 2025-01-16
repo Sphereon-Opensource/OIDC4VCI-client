@@ -99,7 +99,7 @@ export class IDToken {
         const did = jwtIssuer.didUrl.split('#')[0]
         this._payload.sub = did
 
-        const issuer = this._responseOpts.registration.issuer || this._payload.iss
+        const issuer = this._responseOpts.registration?.issuer || this._payload.iss
         if (!issuer || !(issuer.includes(ResponseIss.SELF_ISSUED_V2) || issuer === this._payload.sub)) {
           throw new Error(SIOPErrors.NO_SELF_ISSUED_ISS)
         }

@@ -12,7 +12,7 @@
   "dependencies": {
     "@sphereon/oid4vc-common": "workspace:*",
     "@sphereon/oid4vci-common": "workspace:*",
-    "@sphereon/ssi-types": "0.30.2-feature.mdoc.funke2.367",
+    "@sphereon/ssi-types": "0.32.1-feature.VDX.341.53",
     "uuid": "^9.0.0"
   },
   "peerDependencies": {

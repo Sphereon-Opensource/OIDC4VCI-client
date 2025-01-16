@@ -2,9 +2,11 @@
 // @ts-ignore
 import crypto, { createHash } from 'crypto'
 
+import { digest, ES256, generateSalt } from '@sd-jwt/crypto-nodejs'
+import { SDJwtVcInstance } from '@sd-jwt/sd-jwt-vc'
 import { JwtPayload, parseJWT, SigningAlgo, uuidv4 } from '@sphereon/oid4vc-common'
 import { PartialSdJwtDecodedVerifiableCredential } from '@sphereon/pex/dist/main/lib'
-import { IProofType } from '@sphereon/ssi-types'
+import { IProofType, SdJwtVcKbJwtPayload } from '@sphereon/ssi-types'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
 import base58 from 'bs58'
@@ -26,7 +28,7 @@ import {
   RPRegistrationMetadataPayload,
   Scope,
   SubjectSyntaxTypesSupportedValues,
-  SubjectType,
+  SubjectType
 } from '../'
 import SIOPErrors from '../types/Errors'
 
@@ -38,8 +40,9 @@ import {
   VERIFIER_NAME_FOR_CLIENT,
   VERIFIER_NAME_FOR_CLIENT_NL,
   VERIFIERZ_PURPOSE_TO_VERIFY,
-  VERIFIERZ_PURPOSE_TO_VERIFY_NL,
+  VERIFIERZ_PURPOSE_TO_VERIFY_NL
 } from './data/mockedData'
+
 
 export interface TESTKEY {
   key: JWK
@@ -303,15 +306,51 @@ export const sdJwtVcPresentationSignCallback: PresentationSignCallback = async (
     },
   })
 
-  const header = {
-    ...presentation.kbJwt.header,
-    alg: 'ES256K',
-  }
-  const payload = {
-    ...presentation.kbJwt.payload,
-    aud: '123',
+  const createSignerVerifier = async () => {
+    const { privateKey, publicKey } = await ES256.generateKeyPair();
+    return {
+      signer: await ES256.getSigner(privateKey),
+      verifier: await ES256.getVerifier(publicKey)
+    }
   }
 
-  const kbJwtCompact = `${Buffer.from(JSON.stringify(header)).toString('base64url')}.${Buffer.from(JSON.stringify(payload)).toString('base64url')}.signature`
-  return presentation.compactSdJwtVc + kbJwtCompact
+  const { signer, verifier } = await createSignerVerifier();
+
+  const sdjwt = new SDJwtVcInstance({
+    signer,
+    signAlg: ES256.alg,
+    verifier,
+    hasher: digest,
+    saltGenerator: generateSalt,
+    kbSigner: signer,
+    kbSignAlg: ES256.alg,
+    kbVerifier: verifier
+  })
+
+  const claims = {
+    license: {
+      number: 10
+    },
+    user: {
+      name: 'John',
+      date_of_birth: '01/01/1970'
+    }
+  }
+
+  const kbPayload: Omit<SdJwtVcKbJwtPayload, 'sd_hash'> = presentation.kbJwt.payload
+
+  presentation.compactSdJwtVc = await sdjwt.present<typeof claims>(
+    presentation.compactSdJwtVc,
+    {
+      user: { name: true },
+      license: { number: true }
+    },
+    {
+      kb: {
+        payload: kbPayload,
+      },
+    },
+  );
+
+  return presentation.compactSdJwtVc
 }

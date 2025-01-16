@@ -10,7 +10,7 @@
     "build:clean": "tsc --build --clean && tsc --build"
   },
   "dependencies": {
-    "@sphereon/ssi-types": "0.30.2-feature.mdoc.funke2.367",
+    "@sphereon/ssi-types": "0.32.1-feature.VDX.341.53",
     "jwt-decode": "^4.0.0",
     "sha.js": "^2.4.11",
     "uint8arrays": "3.1.1",

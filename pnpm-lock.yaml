@@ -5,7 +5,8 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  '@sphereon/ssi-types': 0.30.2-feature.mdoc.funke2.367
+  '@sphereon/ssi-types': 0.32.1-feature.VDX.341.53
+  dcql: 0.2.19
   node-fetch: 2.6.12
 
 importers:
@@ -76,8 +77,8 @@ importers:
         specifier: workspace:*
         version: link:../issuer
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       jose:
         specifier: ^4.10.0
         version: 4.15.9
@@ -119,8 +120,8 @@ importers:
         specifier: workspace:*
         version: link:../oid4vci-common
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       cross-fetch:
         specifier: ^3.1.8
         version: 3.1.8(encoding@0.1.13)
@@ -204,8 +205,8 @@ importers:
   packages/common:
     dependencies:
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       jwt-decode:
         specifier: ^4.0.0
         version: 4.0.0
@@ -269,8 +270,8 @@ importers:
         specifier: workspace:*
         version: link:../oid4vci-common
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       awesome-qr:
         specifier: ^2.1.5-rc.0
         version: 2.1.5-rc.0(encoding@0.1.13)
@@ -312,8 +313,8 @@ importers:
         specifier: 0.30.2-feature.mdoc.funke2.367
         version: 0.30.2-feature.mdoc.funke2.367
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       awesome-qr:
         specifier: ^2.1.5-rc.0
         version: 2.1.5-rc.0(encoding@0.1.13)
@@ -404,8 +405,8 @@ importers:
         specifier: workspace:*
         version: link:../common
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       cross-fetch:
         specifier: ^3.1.8
         version: 3.1.8(encoding@0.1.13)
@@ -450,14 +451,17 @@ importers:
         specifier: 5.0.0-unstable.28
         version: 5.0.0-unstable.28
       '@sphereon/pex-models':
-        specifier: ^2.3.1
-        version: 2.3.1
+        specifier: ^2.3.2
+        version: 2.3.2
       '@sphereon/ssi-types':
-        specifier: 0.30.2-feature.mdoc.funke2.367
-        version: 0.30.2-feature.mdoc.funke2.367
+        specifier: 0.32.1-feature.VDX.341.53
+        version: 0.32.1-feature.VDX.341.53
       cross-fetch:
         specifier: ^4.0.0
         version: 4.0.0(encoding@0.1.13)
+      dcql:
+        specifier: 0.2.19
+        version: 0.2.19(typescript@5.4.5)
       debug:
         specifier: ^4.3.5
         version: 4.3.7
@@ -519,6 +523,15 @@ importers:
       '@digitalcredentials/vc':
         specifier: ^6.0.0
         version: 6.0.1(encoding@0.1.13)(expo@48.0.21(@babel/core@7.26.0)(encoding@0.1.13))(react-native@0.71.19(@babel/core@7.26.0)(@babel/preset-env@7.26.0(@babel/core@7.26.0))(encoding@0.1.13)(react@18.3.1))(web-streams-polyfill@3.3.3)
+      '@sd-jwt/crypto-nodejs':
+        specifier: 0.7.2
+        version: 0.7.2
+      '@sd-jwt/sd-jwt-vc':
+        specifier: 0.7.2
+        version: 0.7.2
+      '@sd-jwt/types':
+        specifier: 0.7.2
+        version: 0.7.2
       '@sphereon/did-uni-client':
         specifier: ^0.6.2
         version: 0.6.3(encoding@0.1.13)
@@ -793,14 +806,12 @@ packages:
   '@babel/plugin-proposal-async-generator-functions@7.20.7':
     resolution: {integrity: sha512-xMbiLsn/8RK7Wq7VeVytytS2L6qE69bXPB10YCmMdDZbKF4okCqY74pI/jJQ/8U0b/F6NrT2+14b8/P9/3AMGA==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-async-generator-functions instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
   '@babel/plugin-proposal-class-properties@7.18.6':
     resolution: {integrity: sha512-cumfXOF0+nzZrrN8Rf0t7M+tF6sZc7vhQwYQck9q1/5w2OExlD+b4v4RpMJFaV1Z7WcDRgO6FqvxqxGlwo+RHQ==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-class-properties instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
@@ -819,35 +830,30 @@ packages:
   '@babel/plugin-proposal-export-namespace-from@7.18.9':
     resolution: {integrity: sha512-k1NtHyOMvlDDFeb9G5PhUXuGj8m/wiwojgQVEhJ/fsVsMCpLyOP4h0uGEjYJKrRI+EVPlb5Jk+Gt9P97lOGwtA==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-export-namespace-from instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
   '@babel/plugin-proposal-nullish-coalescing-operator@7.18.6':
     resolution: {integrity: sha512-wQxQzxYeJqHcfppzBDnm1yAY0jSRkUXR2z8RePZYrKwMKgMlE8+Z6LUno+bd6LvbGh8Gltvy74+9pIYkr+XkKA==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-nullish-coalescing-operator instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
   '@babel/plugin-proposal-object-rest-spread@7.20.7':
     resolution: {integrity: sha512-d2S98yCiLxDVmBmE8UjGcfPvNEUbA1U5q5WxaWFUGRzJSVAZqm5W6MbPct0jxnegUZ0niLeNX+IOzEs7wYg9Dg==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-object-rest-spread instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
   '@babel/plugin-proposal-optional-catch-binding@7.18.6':
     resolution: {integrity: sha512-Q40HEhs9DJQyaZfUjjn6vE8Cv4GmMHCYuMGIWUnlxH6400VGxOuwWsPt4FxXxJkC/5eOzgn0z21M9gMT4MOhbw==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-optional-catch-binding instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
   '@babel/plugin-proposal-optional-chaining@7.21.0':
     resolution: {integrity: sha512-p4zeefM72gpmEe2fkUr/OnOXpWEf8nAgk7ZYVqqfFiyIG7oFfVZcCrU64hWn5xp4tQ9LkV4bTIa5rD0KANpKNA==}
     engines: {node: '>=6.9.0'}
-    deprecated: This proposal has been merged to the ECMAScript standard and thus this plugin is no longer maintained. Please use @babel/plugin-transform-optional-chaining instead.
     peerDependencies:
       '@babel/core': ^7.0.0-0
 
@@ -1969,7 +1975,6 @@ packages:
   '@humanwhocodes/config-array@0.13.0':
     resolution: {integrity: sha512-DZLEEqFWQFiyK6h5YIeynKx7JlvCYWL0cImfSRXZ9l4Sg2efkFGTuFf6vzXjK1cq6IYkU+Eg/JizXw+TD2vRNw==}
     engines: {node: '>=10.10.0'}
-    deprecated: Use @eslint/config-array instead
 
   '@humanwhocodes/module-importer@1.0.1':
     resolution: {integrity: sha512-bxveV4V8v5Yb4ncFTT3rPSgZBOpCkjfK0y4oVVVJwIuDVBRMDXrPyXRL988i5ap9m9bnyEEjWfm5WkBmtffLfA==}
@@ -1977,7 +1982,6 @@ packages:
 
   '@humanwhocodes/object-schema@2.0.3':
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
-    deprecated: Use @eslint/object-schema instead
 
   '@hutson/parse-repository-url@3.0.2':
     resolution: {integrity: sha512-H9XAx3hc0BQHY6l+IFSWHDySypcXsvsuLhgYLUGywmJ5pswRVQJUHpOsobnLYp2ZUaUlKiKDrgWWhosOwAEM8Q==}
@@ -2224,7 +2228,6 @@ packages:
   '@npmcli/move-file@1.1.2':
     resolution: {integrity: sha512-1SUf/Cg2GzGDyaf15aR9St9TWlb+XvbZXWpDx8YKs7MLzMH/BCeopv+y9vzrzgkfykCGuWOlSu3mZhj2+FQcrg==}
     engines: {node: '>=10'}
-    deprecated: This functionality has been moved to @npmcli/fs
 
   '@npmcli/name-from-folder@2.0.0':
     resolution: {integrity: sha512-pwK+BfEBZJbKdNYpHHRTNBwBoqrN/iIMO0AiGvYsp3Hoaq0WbgGSWQR6SCldZovoDpY3yje5lkFUe6gsDgJ2vg==}
@@ -2447,12 +2450,28 @@ packages:
   '@scure/base@1.2.1':
     resolution: {integrity: sha512-DGmGtC8Tt63J5GfHgfl5CuAXh96VF/LD8K9Hr/Gv0J2lAoRGlPOMpqMpMbCTOoOJMZCk2Xt+DskdDyn6dEFdzQ==}
 
+  '@sd-jwt/core@0.7.2':
+    resolution: {integrity: sha512-vix1GplUFc1A9H42r/yXkg7cKYthggyqZEwlFdsBbn4xdZNE+AHVF4N7kPa1pPxipwN3UIHd4XnQ5MJV15mhsQ==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/crypto-nodejs@0.7.2':
+    resolution: {integrity: sha512-7DHy1WBHwvXseiX+U7XA6jX4dX4Ins3Nxd12JhBSm+FJfIwU97FU/H0KlF6lLyi4a4nbY/O6U9wJjYI1PxA9sQ==}
+    engines: {node: '>=18'}
+
   '@sd-jwt/decode@0.7.2':
     resolution: {integrity: sha512-dan2LSvK63SKwb62031G4r7TE4TaiI0EK1KbPXqS+LCXNkNDUHqhtYp9uOpj+grXceCsMtMa2f8VnUfsjmwHHg==}
     engines: {node: '>=18'}
 
+  '@sd-jwt/jwt-status-list@0.7.2':
+    resolution: {integrity: sha512-o/Mg/Zg21poFsPXuxtPD9sdXq2b/0L+rb9gxU2k1rp1aT+DWmqD0k8v0Ttr2tlMc8l1xXQNA8FLXbL1AdLRmbQ==}
+    engines: {node: '>=18'}
+
   '@sd-jwt/present@0.7.2':
     resolution: {integrity: sha512-mQV85u2+mLLy2VZ9Wx2zpaB6yTDnbhCfWkP7eeCrzJQHBKAAHko8GrylEFmLKewFIcajS/r4lT/zHOsCkp5pZw==}
+    engines: {node: '>=18'}
+
+  '@sd-jwt/sd-jwt-vc@0.7.2':
+    resolution: {integrity: sha512-rryYmnoJHRSNqHcrs0Atta+bfJzU2yT7mYumR2D4lTfxJKWZd0OHHFq57uZSEm/wXPI6uytUJXYbEboCqLUAtw==}
     engines: {node: '>=18'}
 
   '@sd-jwt/types@0.7.2':
@@ -2534,12 +2553,12 @@ packages:
       react-native-securerandom:
         optional: true
 
-  '@sphereon/kmp-mdoc-core@0.2.0-SNAPSHOT.10':
-    resolution: {integrity: sha512-mHH7I6fWdztaNjguGJOLaerXWnQymQ/xKQ8NqClIXoI2PJNgmpQG6DxFcLRs1aYyWg1iY8bPliLJi41u94KdCA==}
+  '@sphereon/kmp-mdoc-core@0.2.0-SNAPSHOT.26':
+    resolution: {integrity: sha512-QXJ6R8ENiZV2rPMbn06cw5JKwqUYN1kzVRbYfONqE1PEXx1noQ4md7uxr2zSczi0ubKkNcbyYDNtIMTZIhGzmQ==}
     bundledDependencies: []
 
-  '@sphereon/pex-models@2.3.1':
-    resolution: {integrity: sha512-SByU4cJ0XYA6VZQ/L6lsSiRcFtBPHbFioCeQ4GP7/W/jQ+PSBD7uK2oTnKQ9/0iEiMK/6JYqhKgLs4a9UX3UTQ==}
+  '@sphereon/pex-models@2.3.2':
+    resolution: {integrity: sha512-foFxfLkRwcn/MOp/eht46Q7wsvpQGlO7aowowIIb5Tz9u97kYZ2kz6K2h2ODxWuv5CRA7Q0MY8XUBGE2lfOhOQ==}
 
   '@sphereon/pex@5.0.0-unstable.28':
     resolution: {integrity: sha512-zxHCWAc7fKppS7XX0zxnI4TF+Rdjax8pHc3exrYzn3t59dlv5siEAeYdtFrWJT4UVB5wTGzIEufzV5r+tfjelg==}
@@ -2562,8 +2581,8 @@ packages:
   '@sphereon/ssi-sdk-ext.key-utils@0.23.0':
     resolution: {integrity: sha512-BfULXvQmcUrBq2DqYxJHKnEoB2d5icu3TJ9GP2aP1WybSULTjL96Wv5r7QKgktcodKaL+F+oQ7r8sC9qBl1exw==}
 
-  '@sphereon/ssi-types@0.30.2-feature.mdoc.funke2.367':
-    resolution: {integrity: sha512-+acZDnAB08PjhrNX+0sJuGK6X3AN2zZ6dvXjfWCXovWjJwcKJBBGR+nfvguBbefR9aaB8SKPAkDFhQ/U/I7byg==}
+  '@sphereon/ssi-types@0.32.1-feature.VDX.341.53':
+    resolution: {integrity: sha512-SC5GMqMZDILQJLGUddXjkVmSHIsDevp/ANVRGtLsWQK1pt3272eOA6Xq0yBMaAFmknYlisHMOf29JlYLJy/fZw==}
 
   '@sphereon/wellknown-dids-client@0.1.3':
     resolution: {integrity: sha512-TAT24L3RoXD8ocrkTcsz7HuJmgjNjdoV6IXP1p3DdaI/GqkynytXE3J1+F7vUFMRYwY5nW2RaXSgDQhrFJemaA==}
@@ -2992,7 +3011,6 @@ packages:
   '@xmldom/xmldom@0.7.13':
     resolution: {integrity: sha512-lm2GW5PkosIzccsaZIz7tp8cPADSIlIHWDFTR1N0SzfinhhYgeIQjFMz4rYzanCScr3DqQLeomUDArp6MWKm+g==}
     engines: {node: '>=10.0.0'}
-    deprecated: this version is no longer supported, please update to at least 0.8.*
 
   '@xmldom/xmldom@0.8.10':
     resolution: {integrity: sha512-2WALfTl4xo2SkGCYRt6rDTFfk9R1czmBvUQy12gK2KuRKIpWEhcbbzy8EZXtz/jkRqHX8bFEc6FC1HjX4TUWYw==}
@@ -3148,7 +3166,6 @@ packages:
   are-we-there-yet@2.0.0:
     resolution: {integrity: sha512-Ci/qENmwHnsYo9xKIcUJN5LeDKdJ6R1Z1j9V/J5wyq8nh/mYPEpIKJbBZXtZjG04HiK7zV/p6Vs9952MrMeUIw==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer supported.
 
   arg@4.1.0:
     resolution: {integrity: sha512-ZWc51jO3qegGkVh8Hwpv636EkbesNV5ZNQPCtRa+0qytRYPEs9IYT9qITY9buezqUH5uqyzlWLcufrzU2rffdg==}
@@ -3408,7 +3425,6 @@ packages:
 
   boolean@3.2.0:
     resolution: {integrity: sha512-d0II/GO9uf9lfUHH2BQsjxzRJZBdsjgsBiW4BvhWk/3qoKwQFjIDVN19PfX8F2D/r9PCMTtLWjYVCFrpeYUzsw==}
-    deprecated: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
 
   bplist-creator@0.1.0:
     resolution: {integrity: sha512-sXaHZicyEEmY86WyueLTQesbeoH/mquvarJaQNbjuOQO+7gbFcDEWqKmcWA4cOTLzFlfgvkiVxolk1k5bBIpmg==}
@@ -4004,6 +4020,9 @@ packages:
   dayjs@1.11.13:
     resolution: {integrity: sha512-oaMBel6gjolK862uaPQOVTA7q3TZhuSvuMQAAglQDOWYO9A91IrAOUJEyKVlqJlHE0vq5p5UXxzdPfMH/x6xNg==}
 
+  dcql@0.2.19:
+    resolution: {integrity: sha512-/EvT8tArlg8zFsTQbRn6PijfeQ3nUwuEeCRDpptWcYqE8Wyt8J9Sb44gMPFzVCoIEb3R0M7Hl+XWkUMobC8jXQ==}
+
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
     peerDependencies:
@@ -4433,7 +4452,6 @@ packages:
   eslint@8.57.1:
     resolution: {integrity: sha512-ypowyDxpVSYpkXr9WPv2PAZCtNip1Mv5KTW0SCurXv/9iOpcrH9PaqUElksqEB6pChqHGDRCFTyrZlGhnLNGiA==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
-    deprecated: This version is no longer supported. Please see https://eslint.org/version-support for other options.
     hasBin: true
 
   esm@3.2.25:
@@ -4826,7 +4844,6 @@ packages:
   gauge@3.0.2:
     resolution: {integrity: sha512-+5J6MS/5XksCuXq++uFRsnUd7Ovu1XenbeuIuNRJxYWjgQbPuFhT14lAvsWfqfAmnwluf1OwMjz39HjfLPci0Q==}
     engines: {node: '>=10'}
-    deprecated: This package is no longer supported.
 
   gensequence@5.0.2:
     resolution: {integrity: sha512-JlKEZnFc6neaeSVlkzBGGgkIoIaSxMgvdamRoPN8r3ozm2r9dusqxeKqYQ7lhzmj2UhFQP8nkyfCaiLQxiLrDA==}
@@ -4937,20 +4954,16 @@ packages:
 
   glob@6.0.4:
     resolution: {integrity: sha512-MKZeRNyYZAVVVG1oZeLaWie1uweH40m9AZwIwxyPbTSX4hHrVYSzLg0Ro5Z5R7XKkIX+Cc6oD1rqeDJnwsB8/A==}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@7.1.6:
     resolution: {integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
-    deprecated: Glob versions prior to v9 are no longer supported
 
   glob@9.3.5:
     resolution: {integrity: sha512-e1LleDykUz2Iu+MTYdkSsuWX8lvAjAcs0Xef0lNIu0S2wOAzuTxCJtcd9S3cijlwYF18EsU3rzb8jPVobxDh9Q==}
@@ -5193,7 +5206,6 @@ packages:
 
   inflight@1.0.6:
     resolution: {integrity: sha512-k92I/b08q4wvFscXCLvqfsHCrjrF7yiXsQuIVvVE7N82W3+aqpzuUdBbfhWcy/FZR3/4IgflMgKLOsvPDrGCJA==}
-    deprecated: This module is not supported, and leaks memory. Do not use it. Check out lru-cache if you want a good and tested way to coalesce async requests by a key value, which is much more comprehensive and powerful.
 
   inherits@2.0.4:
     resolution: {integrity: sha512-k/vGaX4/Yla3WzyMCvTQOXYeIHvqOKtnqBduzTHpzpQZzAskKMhZ2K+EnBiSM9zGSoIFeMpXKxa4dYeZIQqewQ==}
@@ -6376,7 +6388,6 @@ packages:
   multibase@4.0.6:
     resolution: {integrity: sha512-x23pDe5+svdLz/k5JPGCVdfn7Q5mZVMBETiC+ORfO+sor9Sgs0smJzAjfTbM5tckeCqnaUuMYoz+k3RXMmJClQ==}
     engines: {node: '>=12.0.0', npm: '>=6.0.0'}
-    deprecated: This module has been superseded by the multiformats module
 
   multiformats@12.1.3:
     resolution: {integrity: sha512-eajQ/ZH7qXZQR2AgtfpmSMizQzmyYVmCql7pdhldPuYQi4atACekbJaQplk6dWyIi10jCaFnd6pqvcEFXjbaJw==}
@@ -6572,7 +6583,6 @@ packages:
 
   npmlog@5.0.1:
     resolution: {integrity: sha512-AqZtDUWOMKs1G/8lwylVjrdYgqA4d9nu8hc+0gzRxlDb1I10+FHBGMXs6aiQHFdCUUlqH99MUMuLfzWDNDtfxw==}
-    deprecated: This package is no longer supported.
 
   nullthrows@1.1.1:
     resolution: {integrity: sha512-2vPPEi+Z7WqML2jZYddDIfy5Dqb0r2fze2zTxNNknZaFpVHU3mFB3R+DWeJWGVx0ecvttSGlJTI+WG+8Z4cDWw==}
@@ -6714,7 +6724,6 @@ packages:
 
   osenv@0.1.5:
     resolution: {integrity: sha512-0CWcCECdMVc2Rw3U5w9ZjqX6ga6ubk1xDVKxtBQPK7wis/0F2r9T6k4ydGYhecl7YUBxBVxhL5oisPsNxAPe2g==}
-    deprecated: This package is no longer supported.
 
   p-finally@1.0.0:
     resolution: {integrity: sha512-LICb2p9CB7FS+0eR1oqWnHhp0FljGLZCWBE9aix0Uye9W8LTQPwMTYVGWQWIw9RdQiDg4+epXQODwIYJtSJaow==}
@@ -7376,22 +7385,18 @@ packages:
 
   rimraf@2.2.8:
     resolution: {integrity: sha512-R5KMKHnPAQaZMqLOsyuyUmcIjSeDm+73eoqQpaXA7AZ22BL+6C+1mcUscgOsNd8WVlJuvlgAPsegcx7pjlV0Dg==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@2.4.5:
     resolution: {integrity: sha512-J5xnxTyqaiw06JjMftq7L9ouA448dw/E7dKghkP9WpKNuwmARNNg+Gk8/u5ryb9N/Yo2+z3MCwuqFK/+qPOPfQ==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@2.6.3:
     resolution: {integrity: sha512-mwqeW5XsA2qAejG46gYdENaxXjx9onRNCfn7L0duuP4hCuTIi/QO7PDK07KJfp1d+izWPrzEJDcSqBa0OZQriA==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@3.0.2:
     resolution: {integrity: sha512-JZkJMZkAGFFPP2YqXZXPbMlMBgsxzE8ILs4lMIX/2o0L9UBw9O/Y3o6wFw/i9YLapcUJWwqbi3kdxIPdC62TIA==}
-    deprecated: Rimraf versions prior to v4 are no longer supported
     hasBin: true
 
   rimraf@4.4.1:
@@ -7825,7 +7830,6 @@ packages:
   superagent@8.1.2:
     resolution: {integrity: sha512-6WTxW1EB6yCxV5VFOIPQruWGHqc3yI7hEmZK6h+pyk69Lk/Ut7rLUY6W/ONF2MjBuGjvmMiIpsrVJ2vjrHlslA==}
     engines: {node: '>=6.4.0 <13 || >=14'}
-    deprecated: Please upgrade to v9.0.0+ as we have fixed a public vulnerability with formidable dependency. Note that v9.0.0+ requires Node.js v14.18.0+. See https://github.com/ladjs/superagent/pull/1800 for insight. This project is supported and maintained by the team at Forward Email @ https://forwardemail.net
 
   supertest@6.3.4:
     resolution: {integrity: sha512-erY3HFDG0dPnhw4U+udPfrzXa4xhSG+n4rxfRuZWCUvjFWwKl+OxWf/7zk50s84/fAAs7vf5QAb9uRa0cCykxw==}
@@ -8208,7 +8212,6 @@ packages:
   uglify-es@3.3.9:
     resolution: {integrity: sha512-r+MU0rfv4L/0eeW3xZrd16t4NZfK8Ld4SWVglYBb7ez5uXFWHuVRs6xCTrf1yirs9a4j4Y27nn7SRfO6v67XsQ==}
     engines: {node: '>=0.8.0'}
-    deprecated: support for ECMAScript is superseded by `uglify-js` as of v3.13.0
     hasBin: true
 
   uglify-js@3.19.3:
@@ -8341,7 +8344,6 @@ packages:
 
   uuid@3.4.0:
     resolution: {integrity: sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==}
-    deprecated: Please upgrade  to version 7 or higher.  Older versions may use Math.random() in certain circumstances, which is known to be problematic.  See https://v8.dev/blog/math-random for details.
     hasBin: true
 
   uuid@7.0.3:
@@ -8365,6 +8367,14 @@ packages:
 
   valibot@0.42.1:
     resolution: {integrity: sha512-3keXV29Ar5b//Hqi4MbSdV7lfVp6zuYLZuA9V1PvQUsXqogr+u5lvLPLk3A4f74VUXDnf/JfWMN6sB+koJ/FFw==}
+    peerDependencies:
+      typescript: '>=5'
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+
+  valibot@1.0.0-beta.8:
+    resolution: {integrity: sha512-OPAwJZtowb0j91b+bd77+ny7D1VVzsCzD7Jl9waLUlMprTsfI9Y3HHbW3hAQD7wKDKHsmGEesuiYWaYvcZL2wg==}
     peerDependencies:
       typescript: '>=5'
     peerDependenciesMeta:
@@ -11759,15 +11769,36 @@ snapshots:
 
   '@scure/base@1.2.1': {}
 
+  '@sd-jwt/core@0.7.2':
+    dependencies:
+      '@sd-jwt/decode': 0.7.2
+      '@sd-jwt/present': 0.7.2
+      '@sd-jwt/types': 0.7.2
+      '@sd-jwt/utils': 0.7.2
+
+  '@sd-jwt/crypto-nodejs@0.7.2': {}
+
   '@sd-jwt/decode@0.7.2':
     dependencies:
       '@sd-jwt/types': 0.7.2
       '@sd-jwt/utils': 0.7.2
 
+  '@sd-jwt/jwt-status-list@0.7.2':
+    dependencies:
+      '@sd-jwt/types': 0.7.2
+      base64url: 3.0.1
+      pako: 2.1.0
+
   '@sd-jwt/present@0.7.2':
     dependencies:
       '@sd-jwt/decode': 0.7.2
       '@sd-jwt/types': 0.7.2
+      '@sd-jwt/utils': 0.7.2
+
+  '@sd-jwt/sd-jwt-vc@0.7.2':
+    dependencies:
+      '@sd-jwt/core': 0.7.2
+      '@sd-jwt/jwt-status-list': 0.7.2
       '@sd-jwt/utils': 0.7.2
 
   '@sd-jwt/types@0.7.2': {}
@@ -11863,13 +11894,13 @@ snapshots:
       expo: 48.0.21(@babel/core@7.26.0)(encoding@0.1.13)
       react-native-securerandom: 1.0.1(react-native@0.71.19(@babel/core@7.26.0)(encoding@0.1.13)(react@18.3.1))
 
-  '@sphereon/kmp-mdoc-core@0.2.0-SNAPSHOT.10':
+  '@sphereon/kmp-mdoc-core@0.2.0-SNAPSHOT.26':
     dependencies:
       '@js-joda/core': 5.6.3
       '@js-joda/timezone': 2.3.0(@js-joda/core@5.6.3)
       format-util: 1.0.5
 
-  '@sphereon/pex-models@2.3.1': {}
+  '@sphereon/pex-models@2.3.2': {}
 
   '@sphereon/pex@5.0.0-unstable.28':
     dependencies:
@@ -11877,8 +11908,8 @@ snapshots:
       '@sd-jwt/decode': 0.7.2
       '@sd-jwt/present': 0.7.2
       '@sd-jwt/types': 0.7.2
-      '@sphereon/pex-models': 2.3.1
-      '@sphereon/ssi-types': 0.30.2-feature.mdoc.funke2.367
+      '@sphereon/pex-models': 2.3.2
+      '@sphereon/ssi-types': 0.32.1-feature.VDX.341.53
       ajv: 8.17.1
       ajv-formats: 2.1.1(ajv@8.17.1)
       jwt-decode: 3.1.2
@@ -11930,19 +11961,20 @@ snapshots:
       - react-native-securerandom
       - supports-color
 
-  '@sphereon/ssi-types@0.30.2-feature.mdoc.funke2.367':
+  '@sphereon/ssi-types@0.32.1-feature.VDX.341.53':
     dependencies:
       '@sd-jwt/decode': 0.7.2
-      '@sphereon/kmp-mdoc-core': 0.2.0-SNAPSHOT.10
+      '@sphereon/kmp-mdoc-core': 0.2.0-SNAPSHOT.26
       debug: 4.3.7
       events: 3.3.0
-      jwt-decode: 3.1.2
+      jwt-decode: 4.0.0
+      uint8arrays: 3.1.1
     transitivePeerDependencies:
       - supports-color
 
   '@sphereon/wellknown-dids-client@0.1.3(encoding@0.1.13)':
     dependencies:
-      '@sphereon/ssi-types': 0.30.2-feature.mdoc.funke2.367
+      '@sphereon/ssi-types': 0.32.1-feature.VDX.341.53
       cross-fetch: 3.1.8(encoding@0.1.13)
       jwt-decode: 3.1.2
     transitivePeerDependencies:
@@ -13884,6 +13916,12 @@ snapshots:
   dateformat@3.0.3: {}
 
   dayjs@1.11.13: {}
+
+  dcql@0.2.19(typescript@5.4.5):
+    dependencies:
+      valibot: 1.0.0-beta.8(typescript@5.4.5)
+    transitivePeerDependencies:
+      - typescript
 
   debug@2.6.9:
     dependencies:
@@ -19548,6 +19586,10 @@ snapshots:
   valibot@0.42.1(typescript@5.5.3):
     optionalDependencies:
       typescript: 5.5.3
+
+  valibot@1.0.0-beta.8(typescript@5.4.5):
+    optionalDependencies:
+      typescript: 5.4.5
 
   valid-url@1.0.9: {}
 

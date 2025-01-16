@@ -38,7 +38,7 @@ enum SIOPErrors {
   REFERENCE_URI_NO_PAYLOAD = 'referenceUri specified, but object to host there is not present',
   NO_SELF_ISSUED_ISS = 'The Response Token Issuer Claim (iss) MUST start with https://self-isued.me/v2',
   REGISTRATION_NOT_SET = 'Registration metadata not set.',
-  REQUEST_CLAIMS_PRESENTATION_DEFINITION_BY_REF_AND_VALUE_NON_EXCLUSIVE = "Request claims can't have both 'presentation_definition' and 'presentation_definition_uri'",
+  REQUEST_CLAIMS_PRESENTATION_NON_EXCLUSIVE = "Request claims can't have multiple of 'presentation_definition', 'presentation_definition_uri' and 'dcql_query",
   REQUEST_CLAIMS_PRESENTATION_DEFINITION_NOT_VALID = 'Presentation definition in the request claims is not valid',
   REQUEST_OBJECT_TYPE_NOT_SET = 'Request object type is not set.',
   RESPONSE_OPTS_PRESENTATIONS_SUBMISSION_IS_NOT_VALID = 'presentation_submission object inside the response opts vp should be valid',

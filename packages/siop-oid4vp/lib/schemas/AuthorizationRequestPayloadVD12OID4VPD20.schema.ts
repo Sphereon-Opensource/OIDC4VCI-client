@@ -122,6 +122,9 @@ export const AuthorizationRequestPayloadVD12OID4VPD20SchemaObj = {
         },
         "response_uri": {
           "type": "string"
+        },
+        "dcql_query": {
+          "type": "string"
         }
       }
     },
@@ -705,9 +708,6 @@ export const AuthorizationRequestPayloadVD12OID4VPD20SchemaObj = {
           "type": "string"
         }
       },
-      "required": [
-        "type"
-      ],
       "additionalProperties": false
     },
     "OneOfNumberStringBoolean": {
@@ -940,18 +940,15 @@ export const AuthorizationRequestPayloadVD12OID4VPD20SchemaObj = {
           "type": "string"
         },
         "contains": {
-          "$ref": "#/definitions/FilterV2Base"
+          "$ref": "#/definitions/FilterV2"
         },
         "items": {
-          "$ref": "#/definitions/FilterV2BaseItems"
+          "$ref": "#/definitions/FilterV2Items"
         }
       },
-      "required": [
-        "type"
-      ],
       "additionalProperties": false
     },
-    "FilterV2Base": {
+    "FilterV2Items": {
       "type": "object",
       "properties": {
         "const": {
@@ -1006,78 +1003,12 @@ export const AuthorizationRequestPayloadVD12OID4VPD20SchemaObj = {
           "type": "string"
         },
         "contains": {
-          "$ref": "#/definitions/FilterV2Base"
+          "$ref": "#/definitions/FilterV2"
         },
         "items": {
-          "$ref": "#/definitions/FilterV2BaseItems"
+          "$ref": "#/definitions/FilterV2Items"
         }
       },
-      "additionalProperties": false
-    },
-    "FilterV2BaseItems": {
-      "type": "object",
-      "properties": {
-        "const": {
-          "$ref": "#/definitions/OneOfNumberStringBoolean"
-        },
-        "enum": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/OneOfNumberStringBoolean"
-          }
-        },
-        "exclusiveMinimum": {
-          "$ref": "#/definitions/OneOfNumberString"
-        },
-        "exclusiveMaximum": {
-          "$ref": "#/definitions/OneOfNumberString"
-        },
-        "format": {
-          "type": "string"
-        },
-        "formatMaximum": {
-          "type": "string"
-        },
-        "formatMinimum": {
-          "type": "string"
-        },
-        "formatExclusiveMaximum": {
-          "type": "string"
-        },
-        "formatExclusiveMinimum": {
-          "type": "string"
-        },
-        "minLength": {
-          "type": "number"
-        },
-        "maxLength": {
-          "type": "number"
-        },
-        "minimum": {
-          "$ref": "#/definitions/OneOfNumberString"
-        },
-        "maximum": {
-          "$ref": "#/definitions/OneOfNumberString"
-        },
-        "not": {
-          "type": "object"
-        },
-        "pattern": {
-          "type": "string"
-        },
-        "type": {
-          "type": "string"
-        },
-        "contains": {
-          "$ref": "#/definitions/FilterV2Base"
-        },
-        "items": {
-          "$ref": "#/definitions/FilterV2BaseItems"
-        }
-      },
-      "required": [
-        "type"
-      ],
       "additionalProperties": false
     },
     "ClientIdSchemeOID4VPD20": {

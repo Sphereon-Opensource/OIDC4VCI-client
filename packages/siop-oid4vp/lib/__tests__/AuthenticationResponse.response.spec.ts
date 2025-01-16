@@ -8,6 +8,7 @@ import {
   IVerifiablePresentation,
   OriginalVerifiableCredential,
 } from '@sphereon/ssi-types'
+import { DcqlCredential, DcqlPresentation, DcqlQuery, DcqlQueryResult } from 'dcql'
 
 import {
   AuthorizationResponse,
@@ -27,12 +28,12 @@ import {
   VerifyAuthorizationRequestOpts,
   VPTokenLocation,
 } from '..'
-import { createPresentationSubmission } from '../authorization-response/OpenID4VP'
+import { createPresentationSubmission } from '../authorization-response'
 import SIOPErrors from '../types/Errors'
 
 import { getCreateJwtCallback, getVerifyJwtCallback } from './DidJwtTestUtils'
 import { getResolver } from './ResolverTestUtils'
-import { mockedGetEnterpriseAuthToken, WELL_KNOWN_OPENID_FEDERATION } from './TestUtils'
+import { mockedGetEnterpriseAuthToken, pexHasher, WELL_KNOWN_OPENID_FEDERATION } from './TestUtils'
 import {
   UNIT_TEST_TIMEOUT,
   VERIFIER_LOGO_FOR_CLIENT,
@@ -90,6 +91,7 @@ describe('create JWT from Request JWT should', () => {
 
   const resolver = getResolver('ethr')
   const verifyOpts: VerifyAuthorizationRequestOpts = {
+    hasher: pexHasher,
     verifyJwtCallback: getVerifyJwtCallback(resolver),
     verification: {},
     supportedVersions: [SupportedVersion.SIOPv2_ID1],
@@ -649,5 +651,144 @@ describe('create JWT from Request JWT should', () => {
     if (!jwt) throw new Error('JWT is undefined')
     const authResponse = AuthorizationResponse.fromRequestObject(jwt, responseOpts, verifyOpts)
     await expect(authResponse).toBeDefined()
+  })
+
+  it('succeed when valid JWT with DCQL query is passed in', async () => {
+    expect.assertions(1)
+
+    const mockReqEntity = await mockedGetEnterpriseAuthToken('REQ COMPANY')
+    const mockResEntity = await mockedGetEnterpriseAuthToken('RES COMPANY')
+
+    const dcqlQuery: DcqlQuery = {
+      credentials: [
+        {
+          id: 'Credentials',
+          format: 'vc+sd-jwt',
+          claims: [
+            {
+              path: ['given_name'],
+              values: ['John'],
+            },
+          ],
+        },
+      ],
+    }
+
+    const dcqlParsedQuery = DcqlQuery.parse(dcqlQuery)
+    DcqlQuery.validate(dcqlParsedQuery)
+
+    const requestOpts: CreateAuthorizationRequestOpts = {
+      version: SupportedVersion.SIOPv2_D12_OID4VP_D20,
+      requestObject: {
+        passBy: PassBy.REFERENCE,
+        reference_uri: 'https://my-request.com/here',
+        jwtIssuer: { method: 'did', didUrl: mockReqEntity.did, alg: SigningAlgo.ES256K },
+        createJwtCallback: getCreateJwtCallback({
+          hexPrivateKey: mockReqEntity.hexPrivateKey,
+          did: mockReqEntity.did,
+          kid: `${mockReqEntity.did}#controller`,
+          alg: SigningAlgo.ES256K,
+        }),
+        payload: {
+          client_id: WELL_KNOWN_OPENID_FEDERATION,
+          scope: 'test',
+          response_type: 'id_token vp_token',
+          redirect_uri: EXAMPLE_REDIRECT_URL,
+          dcql_query: JSON.stringify(dcqlParsedQuery),
+        },
+      },
+      clientMetadata: {
+        client_id: WELL_KNOWN_OPENID_FEDERATION,
+        idTokenSigningAlgValuesSupported: [SigningAlgo.EDDSA, SigningAlgo.ES256],
+        subject_syntax_types_supported: ['did:ethr:', SubjectIdentifierType.DID],
+        requestObjectSigningAlgValuesSupported: [SigningAlgo.EDDSA, SigningAlgo.ES256],
+        responseTypesSupported: [ResponseType.ID_TOKEN],
+        scopesSupported: [Scope.OPENID_DIDAUTHN, Scope.OPENID],
+        subjectTypesSupported: [SubjectType.PAIRWISE],
+        vpFormatsSupported: {
+          ldp_vc: {
+            proof_type: [IProofType.EcdsaSecp256k1Signature2019, IProofType.EcdsaSecp256k1Signature2019],
+          },
+        },
+        passBy: PassBy.VALUE,
+        logo_uri: VERIFIER_LOGO_FOR_CLIENT,
+        clientName: VERIFIER_NAME_FOR_CLIENT,
+        'clientName#nl-NL': VERIFIER_NAME_FOR_CLIENT_NL + '2022100315',
+        clientPurpose: VERIFIERZ_PURPOSE_TO_VERIFY,
+        'clientPurpose#nl-NL': VERIFIERZ_PURPOSE_TO_VERIFY_NL,
+      },
+    }
+
+    const sdjwt = {
+      compactJwtVc:
+        'eyJ0eXAiOiJ2YytzZC1qd3QiLCJraWQiOiJkaWQ6andrOmV5SmhiR2NpT2lKRlV6STFOaUlzSW5WelpTSTZJbk5wWnlJc0ltdDBlU0k2SWtWRElpd2lZM0oySWpvaVVDMHlOVFlpTENKNElqb2lTMGRwYzNodlUzaDJhVzB4YTFOSU1XSnROMnhmUkhCeVIyczNZa2RrWkVaYVdXWnRjVXB1VjJWb1NTSXNJbmtpT2lKYVEzQldUVVZSTkhsNGNUSlZiVGRDVGpoSVQyNUdlamszTTFBMFVUQlVkbmRuZVhWUlgyRmlURlZWSW4wIzAiLCJhbGciOiJFUzI1NiJ9.eyJzdWIiOiJkaWQ6andrOmV5SmhiR2NpT2lKRlV6STFOaUlzSW5WelpTSTZJbk5wWnlJc0ltdDBlU0k2SWtWRElpd2lZM0oySWpvaVVDMHlOVFlpTENKNElqb2lXRkpXUVhsNVJIQldNbXBNTm5oNlUwSktZM1JIZW0xS1pqbFFlV0Z4WHpNdFRVeHJlR0ZoUlRBNFRTSXNJbmtpT2lKQ1NtOUtWM05WYTBaQlUyVlRZMmx4VDFsNVNWTTBZMFpoZVU4emFHaEJTalZaYjJ0dU9IcFRTVEZuSW4wIzAiLCJpc3MiOiJkaWQ6andrOmV5SmhiR2NpT2lKRlV6STFOaUlzSW5WelpTSTZJbk5wWnlJc0ltdDBlU0k2SWtWRElpd2lZM0oySWpvaVVDMHlOVFlpTENKNElqb2lTMGRwYzNodlUzaDJhVzB4YTFOSU1XSnROMnhmUkhCeVIyczNZa2RrWkVaYVdXWnRjVXB1VjJWb1NTSXNJbmtpT2lKYVEzQldUVVZSTkhsNGNUSlZiVGRDVGpoSVQyNUdlamszTTFBMFVUQlVkbmRuZVhWUlgyRmlURlZWSW4wIzAiLCJpYXQiOjE3MzQ0NTgwNDIsInZjdCI6InVybjpldS5ldXJvcGEuZWMuZXVkaTpwaWQ6MSIsIl9zZCI6WyIwWWdpR25hck1LSERnVWx1QktteGdRZUJ4OF8xazMwd3NSRVN1X2t1Y0JFIiwiNEpwU2JzUEsxZndUQzRhR24zZ0hXb1BkVEJrMExOTWZMOEJXeEIxZ1JPWSIsIjRpZmplQUZveUEyQmc0STVNWEFrMVlyc1AtUVBQQXRnZGlHY0RMQTZiTFEiLCJBdTFjdURISUNISE1jUjZxM2R3d1pHbHp5dzMwSXhvTGVhWlNxRktEbmo4IiwiQ0QxbWxOY19VaVBoQUp6YkJveTVMY3dtekFNZTM3d0VLZF9iMTB6QTNxNCIsInFwZ1FOUVRac0VJWHdxUk9fT24xdUVCSVVNODBTcTJLR2tlN0JSU2N0WHciXSwiX3NkX2FsZyI6IlNIQS0yNTYifQ.P84d0CoS4M-zQ29l3S97RMatfJMYkoTgR5EqSMTdYlZAMp4e8iiuz2PXQMfJ-_undCvg4SRXxDACGiLL3Tt7Bw~WyJlNTFiNWI2NS0wNzM3LTQ0MjQtYTUxYS1jNGYzZGNlZGFmMmYiLCJnaXZlbl9uYW1lIiwiSm9obiJd~WyIxM2I1NDIwNi1kYWQ3LTQ3N2UtODYyZC03N2ZiMTQ1MDE5NjUiLCJmYW1pbHlfbmFtZSIsIkRvZSJd~WyJkMmQxNjg3Zi04ZmY4LTRlOTMtYWJjYi1hYTNlNGVjYzY0ZTMiLCJlbWFpbCIsImpvaG5kZW9AZXhhbXBsZS5jb20iXQ~WyIyZDA4YTk2YS03YzYwLTQ3NDEtYTI5YS00ZjBjYTFlNGQ3M2IiLCJwaG9uZSIsIisxLTIwMi01NTUtMDEwMSJd~WyI2YjVkN2FmOS01ZmIxLTQzNTEtYWM1ZS1hMzA1YTBkNjU0ZDUiLCJhZGRyZXNzIix7InN0cmVldF9hZGRyZXNzIjoiMTIzIE1haW4gU3QiLCJsb2NhbGl0eSI6IkFueXRvd24iLCJyZWdpb24iOiJBbnlzdGF0ZSIsImNvdW50cnkiOiJVUyJ9XQ~WyI5MmYzY2M5ZC0yMjQ2LTRiODQtYTk5OS0xYmQyM2U0OGQ0MGEiLCJiaXJ0aGRhdGUiLCIxOTQwLTAxLTAxIl0~',
+      decodedPayload: {
+        header: {
+          typ: 'vc+sd-jwt',
+          kid: 'did:jwk:eyJhbGciOiJFUzI1NiIsInVzZSI6InNpZyIsImt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiS0dpc3hvU3h2aW0xa1NIMWJtN2xfRHByR2s3YkdkZEZaWWZtcUpuV2VoSSIsInkiOiJaQ3BWTUVRNHl4cTJVbTdCTjhIT25Gejk3M1A0UTBUdndneXVRX2FiTFVVIn0#0',
+          alg: 'ES256',
+        },
+        payload: {
+          sub: 'did:jwk:eyJhbGciOiJFUzI1NiIsInVzZSI6InNpZyIsImt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiWFJWQXl5RHBWMmpMNnh6U0JKY3RHem1KZjlQeWFxXzMtTUxreGFhRTA4TSIsInkiOiJCSm9KV3NVa0ZBU2VTY2lxT1l5SVM0Y0ZheU8zaGhBSjVZb2tuOHpTSTFnIn0#0',
+          iss: 'did:jwk:eyJhbGciOiJFUzI1NiIsInVzZSI6InNpZyIsImt0eSI6IkVDIiwiY3J2IjoiUC0yNTYiLCJ4IjoiS0dpc3hvU3h2aW0xa1NIMWJtN2xfRHByR2s3YkdkZEZaWWZtcUpuV2VoSSIsInkiOiJaQ3BWTUVRNHl4cTJVbTdCTjhIT25Gejk3M1A0UTBUdndneXVRX2FiTFVVIn0#0',
+          iat: 1734458042,
+          vct: 'urn:eu.europa.ec.eudi:pid:1',
+          given_name: 'John',
+          email: 'johndeo@example.com',
+          birthdate: '1940-01-01',
+          phone: '+1-202-555-0101',
+          address: {
+            street_address: '123 Main St',
+            locality: 'Anytown',
+            region: 'Anystate',
+            country: 'US',
+          },
+          family_name: 'Doe',
+        },
+        kb: undefined,
+      },
+    }
+
+    const vc: DcqlCredential = {
+      credential_format: 'vc+sd-jwt',
+      vct: sdjwt.decodedPayload.payload.vct,
+      claims: sdjwt.decodedPayload.payload,
+    }
+
+    const dcqlQueryResult: DcqlQueryResult = DcqlQuery.query(dcqlQuery, [vc])
+
+    const presentation: DcqlPresentation.Output = {}
+    for (const [key, value] of Object.entries(dcqlQueryResult.credential_matches)) {
+      if (value.success) {
+        presentation[key] = sdjwt.compactJwtVc
+      }
+    }
+
+    const dcqlPresentation = DcqlPresentation.parse(presentation)
+
+    const responseOpts: AuthorizationResponseOpts = {
+      responseURI: EXAMPLE_REDIRECT_URL,
+      responseURIType: 'redirect_uri',
+      createJwtCallback: getCreateJwtCallback({
+        did: mockResEntity.did,
+        hexPrivateKey: mockResEntity.hexPrivateKey,
+        kid: `${mockResEntity.did}#controller`,
+        alg: SigningAlgo.ES256K,
+      }),
+      jwtIssuer: { method: 'did', didUrl: `${mockResEntity.did}#controller`, alg: SigningAlgo.ES256K },
+      dcqlQuery: {
+        dcqlPresentation
+      },
+      responseMode: ResponseMode.DIRECT_POST,
+    }
+
+    const requestObject = await RequestObject.fromOpts(requestOpts)
+    /* console.log(
+      JSON.stringify(await AuthenticationResponse.createJWTFromRequestJWT(requestWithJWT.jwt, responseOpts, verifyOpts))
+    );*/
+    const jwt = await requestObject.toJwt()
+    if (!jwt) throw new Error('JWT is undefined')
+    const authorizationRequest = await AuthorizationResponse.fromRequestObject(jwt, responseOpts, verifyOpts)
+    expect(authorizationRequest).toBeDefined()
   })
 })
