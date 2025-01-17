@@ -1,8 +1,8 @@
-import { AuthorizationResponse } from '../types';
+import { AuthorizationChallengeCodeResponse, AuthorizationResponse } from '../types'
 
 import { convertURIToJsonObject } from './Encoding';
 
-export const toAuthorizationResponsePayload = (input: AuthorizationResponse | string): AuthorizationResponse => {
+export const toAuthorizationResponsePayload = (input: AuthorizationResponse | AuthorizationChallengeCodeResponse | string): AuthorizationResponse | AuthorizationChallengeCodeResponse => {
   let response = input;
   if (typeof input === 'string') {
     if (input.trim().startsWith('{') && input.trim().endsWith('}')) {

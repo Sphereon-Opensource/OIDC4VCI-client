@@ -60,6 +60,7 @@ describe('VcIssuer', () => {
     .withCredentialEndpoint('http://localhost:3456/test/credential-endpoint')
     .withTokenEndpoint('http://localhost:3456/test/token')
     .withAuthorizationEndpoint('https://token-endpoint.example.com/authorize')
+    .withAuthorizationChallengeEndpoint('http://localhost:3456/test/authorize-challenge')
     .withTokenEndpointAuthMethodsSupported(['none', 'client_secret_basic', 'client_secret_jwt', 'client_secret_post'])
     .withResponseTypesSupported(['code', 'token', 'id_token'])
     .withScopesSupported(['openid', 'abcdef'])
@@ -266,6 +267,7 @@ describe('VcIssuer', () => {
   it('should retrieve server metadata', async () => {
     await expect(client.retrieveServerMetadata()).resolves.toEqual({
       authorizationServerMetadata: {
+        authorization_challenge_endpoint: 'http://localhost:3456/test/authorize-challenge',
         authorization_endpoint: 'https://token-endpoint.example.com/authorize',
         credential_endpoint: 'http://localhost:3456/test/credential-endpoint',
         issuer: 'http://localhost:3456/test',
@@ -275,6 +277,7 @@ describe('VcIssuer', () => {
         token_endpoint_auth_methods_supported: ['none', 'client_secret_basic', 'client_secret_jwt', 'client_secret_post'],
       },
       authorizationServerType: 'OID4VCI',
+      authorization_challenge_endpoint: 'http://localhost:3456/test/authorize-challenge',
       authorization_endpoint: 'https://token-endpoint.example.com/authorize',
       deferred_credential_endpoint: undefined,
       authorization_server: 'http://localhost:3456/test',
@@ -316,6 +319,7 @@ describe('VcIssuer', () => {
       token_endpoint: 'http://localhost:3456/test/token',
     })
   })
+
   it('should get state on server side', async () => {
     const preAuthCode = client.credentialOffer!.credential_offer.grants?.[PRE_AUTH_GRANT_LITERAL]?.[PRE_AUTH_CODE_LITERAL]
     expect(preAuthCode).toBeDefined()
@@ -382,4 +386,5 @@ describe('VcIssuer', () => {
       format: 'jwt_vc_json',
     })
   })
+
 })

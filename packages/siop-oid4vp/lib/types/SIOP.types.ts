@@ -189,6 +189,7 @@ export interface AuthorizationResponsePayload {
     | MdocOid4vpMdocVpToken
   presentation_submission?: PresentationSubmission
   verifiedData?: IPresentation | AdditionalClaims
+  is_first_party?: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [x: string]: any
 }

@@ -52,6 +52,9 @@ export const AuthorizationResponseOptsSchemaObj = {
         },
         "presentationExchange": {
           "$ref": "#/definitions/PresentationExchangeResponseOpts"
+        },
+        "isFirstParty": {
+          "type": "boolean"
         }
       },
       "required": [

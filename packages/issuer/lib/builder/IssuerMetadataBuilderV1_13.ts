@@ -4,8 +4,8 @@ import { CredentialSupportedBuilderV1_13 } from './CredentialSupportedBuilderV1_
 import { DisplayBuilder } from './DisplayBuilder'
 
 export class IssuerMetadataBuilderV1_13 {
-  credentialEndpoint: string | undefined
-  credentialIssuer: string | undefined
+  credentialEndpoint?: string
+  credentialIssuer?: string
   supportedBuilders: CredentialSupportedBuilderV1_13[] = []
   credentialConfigurationsSupported: Record<string, CredentialConfigurationSupportedV1_0_13> = {}
   displayBuilders: DisplayBuilder[] = []
@@ -13,6 +13,7 @@ export class IssuerMetadataBuilderV1_13 {
   batchCredentialEndpoint?: string
   authorizationServers?: string[]
   tokenEndpoint?: string
+  authorizationChallengeEndpoint?: string
 
   public withBatchCredentialEndpoint(batchCredentialEndpoint: string) {
     this.batchCredentialEndpoint = batchCredentialEndpoint
@@ -29,6 +30,11 @@ export class IssuerMetadataBuilderV1_13 {
       this.authorizationServers = []
     }
     this.authorizationServers.push(authorizationServer)
+    return this
+  }
+
+  public withAuthorizationChallengeEndpoint(authorizationChallengeEndpoint: string) {
+    this.authorizationChallengeEndpoint = authorizationChallengeEndpoint
     return this
   }
 
@@ -105,14 +111,17 @@ export class IssuerMetadataBuilderV1_13 {
     display.push(...this.display)
     display.push(...this.displayBuilders.map((builder) => builder.build()))
 
-    return {
+    const issuerMetadata: IssuerMetadataV1_0_13 = {
       credential_issuer: this.credentialIssuer,
       credential_endpoint: this.credentialEndpoint,
       credential_configurations_supported,
       // batch_credential_endpoint: this.batchCredentialEndpoint; // not implemented yet
       ...(this.authorizationServers && { authorization_servers: this.authorizationServers }),
       ...(this.tokenEndpoint && { token_endpoint: this.tokenEndpoint }),
+      ...(this.authorizationChallengeEndpoint && { authorization_challenge_endpoint: this.authorizationChallengeEndpoint }),
       ...(display.length > 0 && { display }),
-    } as IssuerMetadataV1_0_13
+    }
+
+    return issuerMetadata
   }
 }

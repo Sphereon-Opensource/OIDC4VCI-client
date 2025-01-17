@@ -25,6 +25,11 @@ export class AuthorizationServerMetadataBuilder {
     return this
   }
 
+  public withAuthorizationChallengeEndpoint(endpoint: string): AuthorizationServerMetadataBuilder {
+    this.metadata.authorization_challenge_endpoint = endpoint
+    return this
+  }
+
   public withTokenEndpoint(endpoint: string): AuthorizationServerMetadataBuilder {
     this.metadata.token_endpoint = endpoint
     return this

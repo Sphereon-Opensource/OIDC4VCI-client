@@ -67,6 +67,7 @@ export interface CredentialIssuerMetadataOpts {
   authorization_server?: string; // OPTIONAL. Identifier of the OAuth 2.0 Authorization Server (as defined in [RFC8414]) the Credential Issuer relies on for authorization. If this element is omitted, the entity providing the Credential Issuer is also acting as the AS, i.e. the Credential Issuer's identifier is used as the OAuth 2.0 Issuer value to obtain the Authorization Server metadata as per [RFC8414].
   token_endpoint?: string;
   notification_endpoint?: string;
+  authorization_challenge_endpoint?: string // OPTIONAL URL of the Credential Issuer's Authorization Challenge Endpoint. This URL MUST use the https scheme and MAY contain port, path and query parameter components. Described on https://www.ietf.org/archive/id/draft-parecki-oauth-first-party-apps-02.html#name-authorization-challenge-end
   display?: MetadataDisplay[]; //  An array of objects, where each object contains display properties of a Credential Issuer for a certain language. Below is a non-exhaustive list of valid parameters that MAY be included:
   credential_supplier_config?: CredentialSupplierConfig;
 }

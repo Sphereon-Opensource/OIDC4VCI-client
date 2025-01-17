@@ -41,6 +41,7 @@ export interface AuthorizationResponseOpts {
   tokenType?: string
   refreshToken?: string
   presentationExchange?: PresentationExchangeResponseOpts
+  isFirstParty?: boolean
 }
 
 export interface PresentationExchangeResponseOpts {

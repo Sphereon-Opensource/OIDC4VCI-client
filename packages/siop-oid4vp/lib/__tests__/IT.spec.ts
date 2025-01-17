@@ -3,6 +3,8 @@ import { EventEmitter } from 'events'
 import { SigningAlgo } from '@sphereon/oid4vc-common'
 import { IPresentationDefinition } from '@sphereon/pex'
 import { CredentialMapper, IPresentation, IProofType, IVerifiableCredential, W3CVerifiablePresentation } from '@sphereon/ssi-types'
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import nock from 'nock'
 
 import { InMemoryRPSessionManager } from '..'

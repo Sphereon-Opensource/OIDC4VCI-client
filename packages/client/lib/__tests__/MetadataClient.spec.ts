@@ -95,7 +95,7 @@ describe('MetadataClient with IdentiProof Issuer should', () => {
     nock(IDENTIPROOF_AS_URL).get(WellKnownEndpoints.OPENID_CONFIGURATION).reply(404);
 
     await expect(() => MetadataClient.retrieveAllMetadata(IDENTIPROOF_ISSUER_URL, { errorOnNotFound: true })).rejects.toThrowError(
-      'Authorization Sever https://auth.research.identiproof.io did not provide a token_endpoint',
+      'Authorization Server https://auth.research.identiproof.io did not provide a token_endpoint',
     );
   });
 

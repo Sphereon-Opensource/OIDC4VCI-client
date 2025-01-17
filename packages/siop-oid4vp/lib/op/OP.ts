@@ -106,6 +106,7 @@ export class OP {
       issuer?: ResponseIss | string
       verification?: Verification
       presentationExchange?: PresentationExchangeResponseOpts
+      isFirstParty?: boolean
     },
   ): Promise<AuthorizationResponseWithCorrelationId> {
     if (

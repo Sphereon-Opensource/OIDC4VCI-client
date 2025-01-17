@@ -50,6 +50,7 @@ export class MetadataClientV1_0_13 {
     let credential_endpoint: string | undefined;
     let deferred_credential_endpoint: string | undefined;
     let authorization_endpoint: string | undefined;
+    let authorization_challenge_endpoint: string | undefined;
     let authorizationServerType: AuthorizationServerType = 'OID4VCI';
     let authorization_servers: string[] = [issuer];
     const oid4vciResponse = await MetadataClientV1_0_13.retrieveOpenID4VCIServerMetadata(issuer, { errorOnNotFound: false }); // We will handle errors later, given we will also try other metadata locations
@@ -104,8 +105,16 @@ export class MetadataClientV1_0_13 {
         );
       }
       authorization_endpoint = authMetadata.authorization_endpoint;
+      if (!authMetadata.authorization_challenge_endpoint) {
+        debug(`Authorization Server ${authorization_servers} did not provide a authorization_challenge_endpoint`);
+      } else if (authorization_challenge_endpoint && authMetadata.authorization_challenge_endpoint !== authorization_challenge_endpoint) {
+        throw Error(
+          `Credential issuer has a different authorization_challenge_endpoint (${authorization_challenge_endpoint}) from the Authorization Server (${authMetadata.authorization_challenge_endpoint})`,
+        );
+      }
+      authorization_challenge_endpoint = authMetadata.authorization_challenge_endpoint;
       if (!authMetadata.token_endpoint) {
-        throw Error(`Authorization Sever ${authorization_servers} did not provide a token_endpoint`);
+        throw Error(`Authorization Server ${authorization_servers} did not provide a token_endpoint`);
       } else if (token_endpoint && authMetadata.token_endpoint !== token_endpoint) {
         throw Error(
           `Credential issuer has a different token_endpoint (${token_endpoint}) from the Authorization Server (${authMetadata.token_endpoint})`,
@@ -164,6 +173,7 @@ export class MetadataClientV1_0_13 {
       deferred_credential_endpoint,
       authorization_server: authorization_servers[0],
       authorization_endpoint,
+      authorization_challenge_endpoint,
       authorizationServerType,
       credentialIssuerMetadata: credentialIssuerMetadata,
       authorizationServerMetadata: authMetadata,

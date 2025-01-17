@@ -32,6 +32,7 @@ export interface IssuerMetadataV1_0_13 {
   credential_response_encryption?: ResponseEncryption;
   token_endpoint?: string;
   display?: MetadataDisplay[];
+  authorization_challenge_endpoint?: string
 
   [x: string]: unknown;
 }
@@ -201,6 +202,7 @@ export interface CredentialIssuerMetadataOptsV1_0_13 {
   authorization_servers?: string[]; // OPTIONAL. Array of strings that identify the OAuth 2.0 Authorization Servers (as defined in [RFC8414]) the Credential Issuer relies on for authorization. If this element is omitted, the entity providing the Credential Issuer is also acting as the AS, i.e. the Credential Issuer's identifier is used as the OAuth 2.0 Issuer value to obtain the Authorization Server metadata as per [RFC8414].
   signed_metadata?: string; // OPTIONAL. String that is a signed JWT. This JWT contains Credential Issuer metadata parameters as claims.
   display?: MetadataDisplay[]; //  An array of objects, where each object contains display properties of a Credential Issuer for a certain language. Below is a non-exhaustive list of valid parameters that MAY be included:
+  authorization_challenge_endpoint?: string // OPTIONAL URL of the Credential Issuer's Authorization Challenge Endpoint. This URL MUST use the https scheme and MAY contain port, path and query parameter components. Described on https://www.ietf.org/archive/id/draft-parecki-oauth-first-party-apps-02.html#name-authorization-challenge-end
 
   //todo: these two are not mentioned in the spec
   token_endpoint?: string;

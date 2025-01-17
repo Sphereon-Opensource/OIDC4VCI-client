@@ -70,6 +70,126 @@ export interface CommonAuthorizationRequest {
   issuer_state?: string;
 }
 
+// https://www.ietf.org/archive/id/draft-parecki-oauth-first-party-apps-02.html#name-authorization-challenge-req
+export interface CommonAuthorizationChallengeRequest {
+  /**
+   * REQUIRED if the client is not authenticating with the authorization server and if no auth_session is included..
+   */
+  client_id?: string;
+  /**
+   * OPTIONAL. String value identifying a certain processing context at the Credential Issuer. A value for this parameter is typically passed in
+   * an issuance initation request from the Credential Issuer to the Wallet. This request parameter is used to pass the
+   * issuer_state value back to the Credential Issuer.
+   */
+  issuer_state?: string
+  /**
+   * The value of the scope parameter is expressed as a list of space-delimited, case-sensitive strings.
+   */
+  scope?: string; // TODO what we do with this
+  /**
+   * OPTIONAL. A random string or a JWE. The auth session allows the authorization server to associate subsequent
+   * requests by this client with an ongoing authorization request sequence. The client MUST include the
+   * auth_session in follow-up requests to the authorization challenge endpoint if it receives one along with
+   * the error response.
+   */
+  auth_session?: string
+  /**
+   * OPTIONAL. If the "code_challenge_method" from Section 4.3 was "S256", the
+   *    received "code_verifier" is hashed by SHA-256, base64url-encoded, and
+   *    then compared to the "code_challenge", i.e.:
+   *    BASE64URL-ENCODE(SHA256(ASCII(code_verifier))) == code_challenge
+   *
+   * If the "code_challenge_method" from Section 4.3 was "plain", they are
+   *    compared directly, i.e.:
+   *    code_verifier == code_challenge.
+   */
+  code_challenge?: string; // TODO what we do with this
+  /**
+   * OPTIONAL. value must be set either to "S256" or a value defined by a cryptographically secure
+   */
+  code_challenge_method?: CodeChallengeMethod; // TODO what we do with this
+  /**
+   * OPTIONAL. String containing information about the session when credential presentation is happening during issuance of another
+   * credential. The content of this parameter is opaque to the wallet. When this parameter is present the Wallet MUST use this parameter in
+   * the subsequent Authorization Challenge Request. This allows the Issuer to determine which it can be used by to prevent session
+   * fixation attacks. The Response URI MAY return this parameter in response to successful Authorization Responses or for Error
+   * Responses.
+   */
+  presentation_during_issuance_session?: string;
+}
+
+export interface AuthorizationChallengeRequestOpts {
+  clientId?: string;
+  issuerState?: string
+  authSession?: string
+  scope?: string
+  codeChallenge?: string
+  codeChallengeMethod?: CodeChallengeMethod
+  presentationDuringIssuanceSession?: string;
+  metadata?: EndpointMetadata;
+  credentialIssuer?: string;
+}
+
+// https://www.ietf.org/archive/id/draft-parecki-oauth-first-party-apps-02.html#name-error-response
+export interface AuthorizationChallengeErrorResponse {
+  /**
+   * A single ASCII error code of type AuthorizationChallengeError.
+   */
+  error: AuthorizationChallengeError
+  /**
+   * OPTIONAL. OPTIONAL. Human-readable ASCII text providing additional information, used
+   * to assist the client developer in understanding the error that occurred. Values for the error_description
+   * parameter MUST NOT include characters outside the set %x20-21 / %x23-5B / %x5D-7E.
+   */
+  error_description?: string
+  /**
+   * OPTIONAL. A URI identifying a human-readable web page with information about the error, used
+   * to provide the client developer with additional information about the error. Values for the error_uri
+   * parameter MUST conform to the URI-reference syntax and thus MUST NOT include characters outside the
+   * set %x21 / %x23-5B / %x5D-7E.
+   */
+  error_uri?: string
+  /**
+   * OPTIONAL. A random string or a JWE. The auth session allows the authorization server to associate subsequent
+   * requests by this client with an ongoing authorization request sequence. The client MUST include the
+   * auth_session in follow-up requests to the authorization challenge endpoint if it receives one along with
+   * the error response.
+   */
+  auth_session?: string
+  /**
+   * OPTIONAL. The request URI corresponding to the authorization request posted. This URI is a single-use reference
+   * to the respective request data in the subsequent authorization request.
+   */
+  request_uri?: string
+  /**
+   * OPTIONAL. A JSON number that represents the lifetime of the request URI in seconds as a positive integer.
+   */
+  expires_in?: number
+  /**
+   * String containing the OID4VP request URI. The Wallet will use this URI to start the OID4VP flow.
+   */
+  presentation?: string
+}
+
+// https://www.ietf.org/archive/id/draft-parecki-oauth-first-party-apps-02.html#name-authorization-challenge-res
+export interface AuthorizationChallengeCodeResponse {
+  /**
+   * The authorization code issued by the authorization server.
+   */
+  authorization_code: string
+}
+
+// https://www.ietf.org/archive/id/draft-parecki-oauth-first-party-apps-02.html#name-error-response
+export enum AuthorizationChallengeError {
+  invalid_request = 'invalid_request',
+  invalid_client = 'invalid_client',
+  unauthorized_client = 'unauthorized_client',
+  invalid_session = 'invalid_session',
+  invalid_scope = 'invalid_scope',
+  insufficient_authorization = 'insufficient_authorization',
+  redirect_to_web = 'redirect_to_web',
+}
+
 /**
  * string type added for conformity with our previous code in the client
  */

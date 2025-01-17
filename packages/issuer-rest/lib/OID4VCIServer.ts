@@ -12,6 +12,7 @@ import express, { Express } from 'express'
 
 import {
   accessTokenEndpoint,
+  authorizationChallengeEndpoint,
   createCredentialOfferEndpoint,
   getBasePath,
   getCredentialEndpoint,
@@ -84,15 +85,34 @@ export interface IGetIssueStatusEndpointOpts extends ISingleEndpointOpts {
   baseUrl: string | URL
 }
 
+export interface IAuthorizationChallengeEndpointOpts extends ISingleEndpointOpts {
+  createAuthRequestUriEndpointPath?: string
+  verifyAuthResponseEndpointPath?: string
+  /**
+   * Callback used for creating the authorization request uri used for the RP.
+   * Added an optional state parameter so that when direct calls are used,
+   * one could set the state value of the RP session to match the state value of the VCI session.
+   */
+  createAuthRequestUriCallback: (state?: string) => Promise<string>
+  /**
+   * Callback used for verifying the status of the authorization response.
+   * This is checked by the issuer before issuing an authorization code.
+   */
+  verifyAuthResponseCallback: (correlationId: string) => Promise<boolean>
+}
+
+export interface IEndpointOpts {
+  tokenEndpointOpts?: ITokenEndpointOpts
+  notificationOpts?: ISingleEndpointOpts
+  createCredentialOfferOpts?: ICreateCredentialOfferEndpointOpts
+  getCredentialOfferOpts?: IGetCredentialOfferEndpointOpts
+  getStatusOpts?: IGetIssueStatusEndpointOpts
+  parOpts?: ISingleEndpointOpts
+  authorizationChallengeOpts?: IAuthorizationChallengeEndpointOpts
+}
+
 export interface IOID4VCIServerOpts extends HasEndpointOpts {
-  endpointOpts?: {
-    tokenEndpointOpts?: ITokenEndpointOpts
-    notificationOpts?: ISingleEndpointOpts
-    createCredentialOfferOpts?: ICreateCredentialOfferEndpointOpts
-    getCredentialOfferOpts?: IGetCredentialOfferEndpointOpts
-    getStatusOpts?: IGetIssueStatusEndpointOpts
-    parOpts?: ISingleEndpointOpts
-  }
+  endpointOpts?: IEndpointOpts
   baseUrl?: string
 }
 
@@ -129,6 +149,19 @@ export class OID4VCIServer<DIDDoc extends object> {
     if (this.isStatusEndpointEnabled(opts?.endpointOpts?.getStatusOpts)) {
       getIssueStatusEndpoint(this.router, this.issuer, { ...opts?.endpointOpts?.getStatusOpts, baseUrl: this.baseUrl })
     }
+    if (this.isAuthorizationChallengeEndpointEnabled(opts?.endpointOpts?.authorizationChallengeOpts)) {
+      if (!opts?.endpointOpts?.authorizationChallengeOpts?.createAuthRequestUriCallback) {
+        throw Error(
+          `Unable to enable authorization challenge endpoint. No createAuthRequestUriCallback present in authorization challenge options`,
+        )
+      }
+      if (!opts?.endpointOpts?.authorizationChallengeOpts?.verifyAuthResponseCallback) {
+        throw Error(
+          `Unable to enable authorization challenge endpoint. No verifyAuthResponseCallback present in authorization challenge options`,
+        )
+      }
+      authorizationChallengeEndpoint(this.router, this.issuer, { ...opts?.endpointOpts?.authorizationChallengeOpts, baseUrl: this.baseUrl })
+    }
     this._app.use(getBasePath(this.baseUrl), this._router)
   }
 
@@ -160,7 +193,11 @@ export class OID4VCIServer<DIDDoc extends object> {
   }
 
   private isStatusEndpointEnabled(statusEndpointOpts?: IGetIssueStatusEndpointOpts) {
-    return statusEndpointOpts?.enabled !== false || process.env.STATUS_ENDPOINT_ENABLED === 'false'
+    return statusEndpointOpts?.enabled !== false || process.env.STATUS_ENDPOINT_ENABLED !== 'false'
+  }
+
+  private isAuthorizationChallengeEndpointEnabled(authorizationChallengeEndpointOpts?: IAuthorizationChallengeEndpointOpts) {
+    return authorizationChallengeEndpointOpts?.enabled === true || process.env.AUTHORIZATION_CHALLENGE_ENDPOINT_ENABLED === 'true'
   }
 
   private assertAccessTokenHandling(tokenEndpointOpts?: ITokenEndpointOpts) {

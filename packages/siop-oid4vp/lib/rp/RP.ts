@@ -41,7 +41,11 @@ import {
   VerifiedAuthorizationResponse,
 } from '../types'
 
-import { createRequestOptsFromBuilderOrExistingOpts, createVerifyResponseOptsFromBuilderOrExistingOpts, isTargetOrNoTargets } from './Opts'
+import {
+  createRequestOptsFromBuilderOrExistingOpts,
+  createVerifyResponseOptsFromBuilderOrExistingOpts,
+  isTargetOrNoTargets
+} from './Opts'
 import { RPBuilder } from './RPBuilder'
 import { IRPSessionManager } from './types'
 

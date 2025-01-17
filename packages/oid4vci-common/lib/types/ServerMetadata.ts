@@ -53,6 +53,7 @@ export type PKCECodeChallengeMethod = 'plain' | 'S256';
 export interface AuthorizationServerMetadata extends DynamicRegistrationClientMetadata {
   issuer: string;
   authorization_endpoint?: string;
+  authorization_challenge_endpoint?: string;
   token_endpoint?: string;
   token_endpoint_auth_methods_supported?: Array<TokenEndpointAuthMethod>;
   token_endpoint_auth_signing_alg_values_supported?: Array<TokenEndpointAuthSigningAlg>;
@@ -109,6 +110,7 @@ export interface AuthorizationServerMetadata extends DynamicRegistrationClientMe
 export const authorizationServerMetadataFieldNames: Array<keyof AuthorizationServerMetadata> = [
   'issuer',
   'authorization_endpoint',
+  'authorization_challenge_endpoint',
   'token_endpoint',
   'jwks_uri',
   'registration_endpoint',
@@ -147,4 +149,5 @@ export interface EndpointMetadata {
   deferred_credential_endpoint?: string;
   authorization_server?: string;
   authorization_endpoint?: string; // Can be undefined in pre-auth flow
+  authorization_challenge_endpoint?: string;
 }
