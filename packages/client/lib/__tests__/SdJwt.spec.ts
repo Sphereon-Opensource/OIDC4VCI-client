@@ -2,14 +2,19 @@ import {
   AccessTokenRequest,
   CredentialConfigurationSupportedSdJwtVcV1_0_13,
   CredentialConfigurationSupportedV1_0_13,
-  CredentialSupportedSdJwtVc,
-} from '@sphereon/oid4vci-common';
+  CredentialSupportedSdJwtVc
+} from '@sphereon/oid4vci-common'
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore
-import nock from 'nock';
+import nock from 'nock'
 
-import { OpenID4VCIClientV1_0_13 } from '..';
-import { AuthorizationServerMetadataBuilder, createAccessTokenResponse, IssuerMetadataBuilderV1_13, VcIssuerBuilder } from '../../../issuer';
+import { OpenID4VCIClientV1_0_13 } from '..'
+import {
+  AuthorizationServerMetadataBuilder,
+  createAccessTokenResponse,
+  IssuerMetadataBuilderV1_13,
+  VcIssuerBuilder
+} from '../../../issuer'
 
 export const UNIT_TEST_TIMEOUT = 30000;
 
@@ -79,6 +84,7 @@ describe('sd-jwt vc', () => {
     'succeed with a full flow',
     async () => {
       const offerUri = await vcIssuer.createCredentialOfferURI({
+        offerMode: 'VALUE',
         grants: {
           'urn:ietf:params:oauth:grant-type:pre-authorized_code': {
             tx_code: {
@@ -182,6 +188,7 @@ describe('sd-jwt vc', () => {
     'succeed with a full flow without did',
     async () => {
       const offerUri = await vcIssuer.createCredentialOfferURI({
+        offerMode: 'VALUE',
         grants: {
           'urn:ietf:params:oauth:grant-type:pre-authorized_code': {
             tx_code: {

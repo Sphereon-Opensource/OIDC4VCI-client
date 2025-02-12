@@ -12,6 +12,7 @@ import {
   CredentialIssuerMetadata,
   CredentialIssuerMetadataOptsV1_0_13,
   CredentialOfferEventNames,
+  CredentialOfferMode,
   CredentialOfferSession,
   CredentialOfferV1_0_13,
   CredentialRequest,
@@ -42,13 +43,34 @@ import {
   TYP_ERROR,
   URIState
 } from '@sphereon/oid4vci-common'
-import { CompactSdJwtVc, CredentialMapper, InitiatorType, SubSystem, System, W3CVerifiableCredential } from '@sphereon/ssi-types'
+import {
+  CompactSdJwtVc,
+  CredentialMapper,
+  InitiatorType,
+  SubSystem,
+  System,
+  W3CVerifiableCredential
+} from '@sphereon/ssi-types'
+import ShortUUID from 'short-uuid'
 
-import { assertValidPinNumber, createCredentialOfferObject, createCredentialOfferURIFromObject, CredentialOfferGrantInput } from './functions'
+import {
+  assertValidPinNumber,
+  createCredentialOfferObject,
+  createCredentialOfferURIFromObject,
+  CredentialOfferGrantInput
+} from './functions'
 import { LookupStateManager } from './state-manager'
-import { CredentialDataSupplier, CredentialDataSupplierArgs, CredentialIssuanceInput, CredentialSignerCallback } from './types'
+import {
+  CredentialDataSupplier,
+  CredentialDataSupplierArgs,
+  CredentialIssuanceInput,
+  CredentialSignerCallback
+} from './types'
+
 
 import { LOG } from './index'
+
+const shortUUID = ShortUUID()
 
 export class VcIssuer<DIDDoc extends object> {
   private readonly _issuerMetadata: CredentialIssuerMetadataOptsV1_0_13
@@ -91,7 +113,7 @@ export class VcIssuer<DIDDoc extends object> {
     this._cNonceExpiresIn = (args?.cNonceExpiresIn ?? (process.env.C_NONCE_EXPIRES_IN ? parseInt(process.env.C_NONCE_EXPIRES_IN) : 300)) as number
   }
 
-  public async getCredentialOfferSessionById(id: string, lookup?: 'uri' | 'id'): Promise<CredentialOfferSession> {
+  public async getCredentialOfferSessionById(id: string, lookup?: 'uri' | 'id' | 'preAuthorizedCode'): Promise<CredentialOfferSession> {
     if (!this.uris) {
       return Promise.reject(Error('Cannot lookup credential offer by id if URI state manager is not set'))
     }
@@ -145,6 +167,8 @@ export class VcIssuer<DIDDoc extends object> {
   }
 
   public async createCredentialOfferURI(opts: {
+    offerMode: CredentialOfferMode
+    issuerPayloadUri?: string
     grants?: CredentialOfferGrantInput
     credential_configuration_ids?: Array<string>
     credentialDefinition?: JsonLdIssuerCredentialDefinition
@@ -156,7 +180,10 @@ export class VcIssuer<DIDDoc extends object> {
     qrCodeOpts?: QRCodeOpts,
     statusListOpts?: Array<StatusListOpts>
   }): Promise<CreateCredentialOfferURIResult> {
-    const { credential_configuration_ids, statusListOpts } = opts
+    const { offerMode, issuerPayloadUri, credential_configuration_ids, statusListOpts } = opts
+    if (offerMode === 'REFERENCE' && !issuerPayloadUri) {
+      return Promise.reject(Error('issuePayloadPath must bet set for offerMode REFERENCE!'))
+    }
 
     const grants = opts.grants ? { ...opts.grants } : {}
     // for backwards compat, would be better if user sets the prop on the grants directly
@@ -171,6 +198,7 @@ export class VcIssuer<DIDDoc extends object> {
     if (grants[PRE_AUTH_GRANT_LITERAL]?.tx_code && !grants[PRE_AUTH_GRANT_LITERAL]?.tx_code?.length) {
       grants[PRE_AUTH_GRANT_LITERAL].tx_code.length = 4
     }
+
 
     const baseUri = opts?.baseUri ?? this.defaultCredentialOfferBaseUri
     const credentialOfferObject = createCredentialOfferObject(this._issuerMetadata, {
@@ -200,17 +228,21 @@ export class VcIssuer<DIDDoc extends object> {
     }
     const createdAt = +new Date()
     const lastUpdatedAt = createdAt
-    if (opts?.credentialOfferUri) {
+    if (offerMode === 'REFERENCE') {
       if (!this.uris) {
         throw Error('No URI state manager set, whilst apparently credential offer URIs are being used')
       }
-      await this.uris.set(opts.credentialOfferUri, {
-        uri: opts.credentialOfferUri,
+      const credentialOfferCorrelationId = shortUUID.generate()// TODO allow to be supplied
+      credentialOfferObject.credential_offer_uri = opts.credentialOfferUri ?? `${issuerPayloadUri?.replace(':id', credentialOfferCorrelationId)}` // TODO how is this going to work with auth code flow?
+      await this.uris.set(credentialOfferCorrelationId, {
+        uri: credentialOfferObject.credential_offer_uri,
         createdAt: createdAt,
         preAuthorizedCode,
         issuerState,
+        credentialOfferCorrelationId
       })
     }
+
 
     const credentialOffer = await toUniformCredentialOfferRequest(
       {
@@ -245,7 +277,7 @@ export class VcIssuer<DIDDoc extends object> {
       await this.credentialOfferSessions.set(issuerState, session)
     }
 
-    const uri = createCredentialOfferURIFromObject(credentialOffer, { ...opts, baseUri })
+    const uri = createCredentialOfferURIFromObject(credentialOffer, offerMode, { ...opts, baseUri })
     let qrCodeDataUri: string | undefined
     if (opts.qrCodeOpts) {
       const { AwesomeQR } = await import('awesome-qr')

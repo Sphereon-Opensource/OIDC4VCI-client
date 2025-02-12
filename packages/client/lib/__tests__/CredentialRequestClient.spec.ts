@@ -341,3 +341,62 @@ describe('Credential Request Client with different issuers ', () => {
     });
   });
 });
+
+describe('Credential Offer Client error handling', () => {
+  beforeEach(() => {
+    nock.cleanAll()
+  })
+
+  afterEach(() => {
+    nock.cleanAll()
+  })
+
+  it('should handle non-200 response from credential offer URI endpoint', async () => {
+    const IRR_URI = 'openid-credential-offer://?credential_offer_uri=https%3A%2F%2Ftest.example.com%2Foffer'
+
+    nock('https://test.example.com')
+      .get('/offer')
+      .reply(404, 'Not Found')
+
+    await expect(CredentialOfferClient.fromURI(IRR_URI)).rejects.toMatch(
+      /the credential offer URI endpoint call was not successful. http code 404 - reason Not Found/
+    )
+  })
+
+  it('should handle invalid content type from credential offer URI endpoint', async () => {
+    const IRR_URI = 'openid-credential-offer://?credential_offer_uri=https%3A%2F%2Ftest.example.com%2Foffer'
+
+    nock('https://test.example.com')
+      .get('/offer')
+      .reply(200, 'plain text response', { 'Content-Type': 'text/plain' })
+
+    await expect(CredentialOfferClient.fromURI(IRR_URI)).rejects.toMatch(
+      'the credential offer URI endpoint did not return content type application/json'
+    )
+  })
+
+  it('should handle missing required credential offer properties', async () => {
+    const IRR_URI = 'openid-credential-offer://?invalid_param=test'
+
+  await expect(CredentialOfferClient.fromURI(IRR_URI)).rejects.toThrow('Wrong parameters provided')
+  })
+
+  it('should handle credential offer URI with credential_offer param', async () => {
+    const IRR_URI = 'openid-credential-offer://?credential_offer=%7B%22test%22%3A%22value%22%7D'
+
+    const client = await CredentialOfferClient.fromURI(IRR_URI)
+    expect(client.credential_offer).toBeDefined()
+  })
+
+  it('should handle URL encoded credential offer URI properly', async () => {
+    const encodedUri = 'https%3A%2F%2Ftest.example.com%2Foffer'
+    const IRR_URI = `openid-credential-offer://?credential_offer_uri=${encodedUri}`
+
+    nock('https://test.example.com')
+      .get('/offer')
+      .reply(200, { test: 'value' }, { 'Content-Type': 'application/json' })
+
+    const client = await CredentialOfferClient.fromURI(IRR_URI)
+    expect(client.credential_offer).toBeDefined()
+  })
+})

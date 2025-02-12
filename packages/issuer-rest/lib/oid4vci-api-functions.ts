@@ -9,6 +9,7 @@ import {
   AuthorizationRequest,
   CommonAuthorizationChallengeRequest,
   CredentialIssuerMetadataOptsV1_0_13,
+  CredentialOfferMode,
   CredentialOfferRESTRequest,
   CredentialRequestV1_0_13,
   determineGrantTypes,
@@ -93,6 +94,47 @@ export function getIssueStatusEndpoint<DIDDoc extends object>(router: Router, is
       )
     }
   })
+}
+
+export function getIssuePayloadEndpoint<DIDDoc extends object>(router: Router, issuer: VcIssuer<DIDDoc>, opts: IGetIssueStatusEndpointOpts) : string {
+  const path = determinePath(opts.baseUrl, opts?.path ?? '/credential-offers/:id', { stripBasePath: true })
+  LOG.log(`[OID4VCI] getIssuePayloadEndpoint endpoint enabled at ${path}`)
+  router.get(path, async (request: Request, response: Response) => {
+    try {
+      const { id } = request.params
+      if (!id) {
+        return sendErrorResponse(response, 404, {
+          error: 'invalid_request',
+          error_description: `query parameter 'id' is missing`
+        })
+      }
+      
+      let session
+      try {
+        session = await issuer.getCredentialOfferSessionById(id as string, 'preAuthorizedCode')
+      } catch (e) { /* will crash with 500 instead of 404 if we do not catch */ }
+
+      if (!session || !session.credentialOffer) {
+        return sendErrorResponse(response, 404, {
+          error: 'invalid_request',
+          error_description: `Credential offer ${id} not found`,
+        })
+      }
+
+      return response.json(session.credentialOffer.credential_offer)
+    } catch (e) {
+      return sendErrorResponse(
+        response,
+        500,
+        {
+          error: 'invalid_request',
+          error_description: (e as Error).message,
+        },
+        e,
+      )
+    }
+  })
+  return path
 }
 
 function isExternalAS(issuerMetadata: CredentialIssuerMetadataOptsV1_0_13) {
@@ -423,12 +465,34 @@ export function deleteCredentialOfferEndpoint<DIDDoc extends object>(
   })
 }
 
+function buildIssuerPayloadUri(request: Request<CredentialOfferRESTRequest>, issuerPayloadPathConst?: string) {
+  if (!issuerPayloadPathConst) {
+    return Promise.reject(Error('issuePayloadPath must bet set for offerMode REFERENCE!'))
+  }
+
+  const protocol = request.headers['x-forwarded-proto']?.toString() ?? request.protocol
+  let host = request.headers['x-forwarded-host']?.toString() ?? request.get('host')
+  const forwardedPort = request.headers['x-forwarded-port']?.toString()
+
+  if (forwardedPort && !(protocol === 'https' && forwardedPort === '443') && !(protocol === 'http' && forwardedPort === '80')) {
+    host += `:${forwardedPort}`
+  }
+
+  const forwardedPrefix = request.headers['x-forwarded-prefix']?.toString() ?? ''
+
+  return `${protocol}://${host}${forwardedPrefix}${request.baseUrl}${issuerPayloadPathConst}`
+}
+
+
 export function createCredentialOfferEndpoint<DIDDoc extends object>(
   router: Router,
   issuer: VcIssuer<DIDDoc>,
   opts?: ICreateCredentialOfferEndpointOpts & { baseUrl?: string },
+  issuerPayloadPath?: string
 ) {
+  const issuerPayloadPathConst = issuerPayloadPath
   const path = determinePath(opts?.baseUrl, opts?.path ?? '/webapp/credential-offers', { stripBasePath: true })
+
   LOG.log(`[OID4VCI] createCredentialOffer endpoint enabled at ${path}`)
   router.post(path, async (request: Request<CredentialOfferRESTRequest>, response: Response<ICreateCredentialOfferURIResponse>) => {
     try {
@@ -453,7 +517,18 @@ export function createCredentialOfferEndpoint<DIDDoc extends object>(
         })
       }
       const qrCodeOpts = request.body.qrCodeOpts ?? opts?.qrCodeOpts
-      const result = await issuer.createCredentialOfferURI({ ...request.body, qrCodeOpts, grants })
+      const offerMode: CredentialOfferMode = request.body.offerMode
+        ?? opts?.defaultCredentialOfferPayloadMode
+        ?? 'VALUE' // default to existing mode when nothing specified
+
+
+      const result = await issuer.createCredentialOfferURI({
+        ...request.body,
+        offerMode: offerMode,
+        ...(offerMode === 'REFERENCE' && { issuerPayloadUri: buildIssuerPayloadUri(request, issuerPayloadPathConst) }),
+        qrCodeOpts,
+        grants
+      })
       const resultResponse: ICreateCredentialOfferURIResponse = result
       if ('session' in resultResponse) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

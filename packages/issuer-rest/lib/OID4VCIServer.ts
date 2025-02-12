@@ -1,12 +1,18 @@
 import {
   AuthorizationRequest,
   CredentialConfigurationSupportedV1_0_13,
+  CredentialOfferMode,
   IssuerCredentialSubjectDisplay,
   OID4VCICredentialFormat,
   QRCodeOpts,
-  TxCode,
+  TxCode
 } from '@sphereon/oid4vci-common'
-import { CredentialSupportedBuilderV1_13, ITokenEndpointOpts, VcIssuer, VcIssuerBuilder } from '@sphereon/oid4vci-issuer'
+import {
+  CredentialSupportedBuilderV1_13,
+  ITokenEndpointOpts,
+  VcIssuer,
+  VcIssuerBuilder
+} from '@sphereon/oid4vci-issuer'
 import { ExpressSupport, HasEndpointOpts, ISingleEndpointOpts } from '@sphereon/ssi-express-support'
 import express, { Express } from 'express'
 
@@ -18,9 +24,10 @@ import {
   getBasePath,
   getCredentialEndpoint,
   getCredentialOfferEndpoint,
+  getIssuePayloadEndpoint,
   getIssueStatusEndpoint,
   getMetadataEndpoints,
-  pushedAuthorizationEndpoint,
+  pushedAuthorizationEndpoint
 } from './oid4vci-api-functions'
 
 function buildVCIFromEnvironment<DIDDoc extends object>() {
@@ -84,9 +91,14 @@ export interface IDeleteCredentialOfferEndpointOpts extends ISingleEndpointOpts 
 export interface ICreateCredentialOfferEndpointOpts extends ISingleEndpointOpts {
   getOfferPath?: string
   qrCodeOpts?: QRCodeOpts
+  defaultCredentialOfferPayloadMode?: CredentialOfferMode
 }
 
 export interface IGetIssueStatusEndpointOpts extends ISingleEndpointOpts {
+  baseUrl: string | URL
+}
+
+export interface IGetIssuePayloadEndpointOpts extends ISingleEndpointOpts {
   baseUrl: string | URL
 }
 
@@ -113,6 +125,7 @@ export interface IOID4VCIEndpointOpts {
   deleteCredentialOfferOpts?: IDeleteCredentialOfferEndpointOpts
   getCredentialOfferOpts?: IGetCredentialOfferEndpointOpts
   getStatusOpts?: IGetIssueStatusEndpointOpts
+  getIssuePayloadOpts?: IGetIssuePayloadEndpointOpts
   parOpts?: ISingleEndpointOpts
   authorizationChallengeOpts?: IAuthorizationChallengeEndpointOpts
 }
@@ -143,8 +156,14 @@ export class OID4VCIServer<DIDDoc extends object> {
 
     pushedAuthorizationEndpoint(this.router, this.issuer, this.authRequestsData)
     getMetadataEndpoints(this.router, this.issuer)
+
+    let issuerPayloadPath: string | undefined
+    if(this.isGetIssuePayloadEndpointEnabled(opts?.endpointOpts?.getIssuePayloadOpts)) {
+      issuerPayloadPath = getIssuePayloadEndpoint(this.router, this.issuer, { ...opts?.endpointOpts?.getIssuePayloadOpts, baseUrl: this.baseUrl })
+    }
+
     if (opts?.endpointOpts?.createCredentialOfferOpts?.enabled !== false || process.env.CREDENTIAL_OFFER_ENDPOINT_ENABLED === 'true') {
-      createCredentialOfferEndpoint(this.router, this.issuer, opts?.endpointOpts?.createCredentialOfferOpts)
+      createCredentialOfferEndpoint(this.router, this.issuer, opts?.endpointOpts?.createCredentialOfferOpts, issuerPayloadPath)
       deleteCredentialOfferEndpoint(this.router, this.issuer, opts?.endpointOpts?.deleteCredentialOfferOpts)
     }
     getCredentialOfferEndpoint(this.router, this.issuer, opts?.endpointOpts?.getCredentialOfferOpts)
@@ -197,6 +216,10 @@ export class OID4VCIServer<DIDDoc extends object> {
 
   private isStatusEndpointEnabled(statusEndpointOpts?: IGetIssueStatusEndpointOpts) {
     return statusEndpointOpts?.enabled !== false || process.env.STATUS_ENDPOINT_ENABLED !== 'false'
+  }
+
+  private isGetIssuePayloadEndpointEnabled(payloadEndpointOpts?: IGetIssuePayloadEndpointOpts) {
+    return payloadEndpointOpts?.enabled !== false || process.env.STATUS_ENDPOINT_ENABLED !== 'false'
   }
 
   private isAuthorizationChallengeEndpointEnabled(authorizationChallengeEndpointOpts?: IAuthorizationChallengeEndpointOpts) {

@@ -44,7 +44,7 @@ export class CredentialOfferClientV1_0_11 {
         requiredProperties: uri.includes('credential_offer_uri=') ? ['credential_offer_uri='] : ['credential_offer='],
       }) as CredentialOfferV1_0_11;
       if (credentialOffer?.credential_offer_uri === undefined && !credentialOffer?.credential_offer) {
-        throw Error('Either a credential_offer or credential_offer_uri should be present in ' + uri);
+        throw Error('Either a credential_offer or credential_offer_uri should be present in ' + uri); // cannot be reached since convertURIToJsonObject will check the params
       }
     }
 
